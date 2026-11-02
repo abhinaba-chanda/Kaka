@@ -1,0 +1,22 @@
+{
+    "gemini_api_key": "PASTE-YOUR-GEMINI-KEY-HERE (or leave this file alone: Kaka creates api_keys.json on first run)",
+    "os_system": "windows",
+    "assistant_name": "Kaka",
+    "user_name": "Your Name",
+    "providers": {
+        "mode": "pipeline",
+        "pipeline": {
+            "stt": "kaka_ear",
+            "llm": "kaka_chain",
+            "tts": "kaka_voice"
+        },
+        "creds": {
+            "kaka_chain": {
+                "catalog": "kaka_chain"
+            }
+        },
+        "sidecar_first": false
+    },
+    "kaka_brain_first": "auto",
+    "hud_style": "minimal"
+}

@@ -1,0 +1,44 @@
+# Kaka by Abhinaba Chanda - what never belongs in this repository
+
+# Secrets (keys, tokens, certificates, linked sessions)
+app/config/api_keys.json
+app/config/certs/
+app/config/whatsapp_web/
+**/token*.json
+**/client_secret*.json
+*credentials*.json
+discord.json
+.env
+.env.*
+
+# Personal data Kaka saves
+Data/
+app/memory/long_term.json
+app/memory/*.db
+
+# Downloaded models (fetched on first use)
+app/models/
+
+# Python / venv / build
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+build/
+dist/
+/Kaka/
+*.spec
+
+# Logs and backups made by updates
+*.log
+logs/
+kaka-update*-backup-*/
+kaka-fix-backup-*/
+kaka-logo-backup-*/
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
