@@ -109,6 +109,8 @@ Twelve upgrades in one update. Every feature is its own file in `app/`, so if on
 
 **12. Diary** - "diary mein likho aaj gym gaya", "kal kya likha tha?", "diary padho", "diary mein Rahul dhoondo", "5 November ki diary". Dated entries saved on your PC (`Data\diary.json`). "Kal wali entry delete karo" asks first. Quick to-dos still go to the notes panel ("note karo ...").
 
+**Deep Research (new)** - "Chandrayaan-3 pe deep research karo", "deep dive into how transformers work", "X ke baare mein detail mein research karo". Kaka splits the topic into 4-6 sub-questions, searches each one, reads the actual web pages and Wikipedia, and writes a full report (overview, a section per question, key facts and numbers, different viewpoints, numbered clickable sources). It shows live progress, speaks a short summary in your language, opens the report on screen and saves it as Markdown + PDF in `Data\Research`. Follow up with "point 3 aur detail mein batao" or "is pe aur research karo". Quick questions still use normal search.
+
 Already installed Kaka? Run **Kaka-Features.bat** once (it backs up every file it changes, installs the wake model, asks your city and restarts Kaka). From now on, auto-update does it for you.
 
 ---
