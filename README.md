@@ -10,7 +10,7 @@
 ![Python 3.13](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
 ![PyQt6](https://img.shields.io/badge/UI-PyQt6-41CD52?logo=qt&logoColor=white)
 ![Gemini Live](https://img.shields.io/badge/Voice-Gemini%20Live-8E75B2?logo=googlegemini&logoColor=white)
-![Licence CC BY-NC 4.0](https://img.shields.io/badge/Licence-CC%20BY--NC%204.0-lightgrey)
+![Licence CC BY-NC-SA 4.0](https://img.shields.io/badge/Licence-CC%20BY--NC--SA%204.0-lightgrey)
 
 </div>
 
@@ -475,7 +475,7 @@ Setup logs for these go to `%USERPROFILE%\kaku-setup-logs\`.
 ```text
 Kaka/                          (clone this into your install folder, e.g. C:\Kaka)
 ├── README.md                  this file
-├── LICENSE                    CC BY-NC 4.0
+├── LICENSE                    CC BY-NC-SA 4.0
 ├── Kaka-Setup.bat             one-file Windows installer
 ├── docs/
 │   ├── banner.png, kaka-logo.png
@@ -528,9 +528,11 @@ Kaka/                          (clone this into your install folder, e.g. C:\Kak
 Based on [Mark LVI by FatihMakes](https://github.com/FatihMakes/Mark-LVI) · licensed [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) · modified by Abhinaba Chanda
 
 - **Mark LVI** (base app, HUD, Gemini Live engine, base tools, phone dashboard) © 2026 FatihMakes. Kaka started from commit `4d4035c`.
-- **Kaka changes** (everything listed under Features that is not in Mark LVI) © 2026 Abhinaba Chanda, under the same licence.
+- **Kaka changes** (everything listed under Features that is not in Mark LVI) © 2026 Abhinaba Chanda, licensed [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 - Vosk speech model by Alpha Cephei (Apache 2.0), downloaded on first use. Face models from OpenCV Zoo, hand model from Google MediaPipe, both downloaded on first use.
 
-**Licence:** this project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**; the full text is in [LICENSE](LICENSE). You may use, share and change it for **non-commercial** purposes, as long as you keep the credit to FatihMakes and to Abhinaba Chanda and say what you changed. **Commercial use is not allowed.**
+**Licence:** Kaka is licensed under **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International ([CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/))**; the full text is in [LICENSE](LICENSE). The Mark LVI base it started from is licensed [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/). You may use, share and change Kaka for **non-commercial** purposes, as long as you keep the credit and say what you changed. **Commercial use is not allowed.**
+
+**Forks and modifications** must keep the credit to Abhinaba Chanda, stay non-commercial, and be released under the same licence (CC BY-NC-SA 4.0).
 
 <div align="center"><sub>Made with ☕ in Kolkata · Kaka by Abhinaba Chanda</sub></div>
