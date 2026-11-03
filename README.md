@@ -326,7 +326,7 @@ Other places Kaka touches:
 
 ### Easy install (recommended): one file, double-click
 
-**Easy install: download [Kaka-Setup.bat](https://github.com/abhinaba-chanda/Kaka/blob/main/Kaka-Setup.bat) (from [Releases](https://github.com/abhinaba-chanda/Kaka/releases/latest), or open the file here and click *Download raw file*) and double-click it.**
+**Easy install: download [Kaka-Setup.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup.bat) (direct download from [Releases](https://github.com/abhinaba-chanda/Kaka/releases/latest)) and double-click it.**
 
 It does everything for you, with live progress, in plain English:
 
