@@ -41,7 +41,8 @@ _speak_impl: Optional[Callable[[str], None]] = None
 
 # Modules that register background workers with on_start(). Imported in the
 # background thread (not at startup), so Kaka opens exactly as fast as before.
-SERVICE_MODULES = ["core.kaka_reminders", "core.kaka_game", "core.kaka_feeds"]
+SERVICE_MODULES = ["core.kaka_reminders", "core.kaka_game", "core.kaka_feeds",
+                   "kaka_v11"]          # KAKA v1.1: daily summary + update check
 
 
 def bind(jarvis) -> None:
@@ -318,6 +319,12 @@ def say(text: str, urgent: bool = False, wait_s: float = 25.0, brief: bool = Tru
             return "queued"
         if _J is None:
             return "no-session"
+        try:                       # KAKA v1.1: wake-word sleep -> listen for his answer
+            if getattr(_J, "_wake_enabled", False) and not getattr(_J, "_awake", True) \
+                    and not _asleep():
+                _J.wake(reason="Kaka ko kuch batana hai")
+        except Exception:
+            pass
         with _SAY_LOCK:
             slept = _asleep()
             if slept:

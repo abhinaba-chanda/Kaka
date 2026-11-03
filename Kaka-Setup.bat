@@ -661,6 +661,22 @@ while (-not $UserName) {
 }
 Ok "Kaka aapko '$UserName' bulayega"
 
+# ------------------------------------------------------------------ your city (weather, morning brief)
+$CurCity = ''
+if (Test-Path $KeysFile) {
+    try { $CurCity = Clean-Name ((Get-Content -LiteralPath $KeysFile -Raw -Encoding UTF8 | ConvertFrom-Json).user_city) } catch { }
+}
+if (-not $CurCity) { $CurCity = Clean-Name (Get-UserEnv 'KAKA_USER_CITY') }
+$CityDefault = $CurCity
+if ($env:KAKA_SETUP_CITY) { $CityDefault = Clean-Name $env:KAKA_SETUP_CITY }
+if (-not $CityDefault) { $CityDefault = 'Kolkata' }
+Write-Host ''
+Write-Host '    Your city' -ForegroundColor White
+if ($CurCity) { Info "Abhi city '$CurCity' hai. Enter dabao to yahi rahega." }
+$UserCity = Clean-Name (Ask 'Aapka city kaunsa hai? (weather isi city ka batayega)' $CityDefault)
+if (-not $UserCity) { $UserCity = 'Kolkata' }
+Ok "Kaka '$UserCity' ka mausam batayega"
+
 # ------------------------------------------------------------------ STEP 2: requirements
 Step 'Checking your PC'
 $script:rows = @()
@@ -881,6 +897,17 @@ if (-not $nameSaved -and -not (Test-Path $KeysFile)) {
 if ($nameSaved) { Ok "Your name saved: $UserName (change it later in Kaka: gear > Customise > YOUR NAME)" }
 else { Warn "Your name is kept in the KAKA_USER_NAME user variable (the settings file was not changed). Kaka still uses it." }
 
+# your city: into the settings file (kaka_user.py keeps every other setting) + a user variable
+Set-UserEnv 'KAKA_USER_CITY' $UserCity
+$citySaved = $false
+if ((Test-Path $kuPy) -and $BasePy) {
+    $env:KAKA_SET_CITY = $UserCity
+    try { $kuOut = (& $BasePy $kuPy 'setcity' 2>&1 | Out-String); $citySaved = ($LASTEXITCODE -eq 0) -and ($kuOut -match 'CITY\|saved\|') } catch { }
+    Remove-Item env:KAKA_SET_CITY -ErrorAction SilentlyContinue
+}
+if ($citySaved) { Ok "Your city saved: $UserCity (change it later: gear > Customise > YOUR CITY, or say 'Kaka, mera city Delhi kar do')" }
+else { Warn "Your city is kept in the KAKA_USER_CITY user variable (the settings file was not changed). Kaka still uses it." }
+
 # ------------------------------------------------------------------ STEP 6: Python packages
 Step 'Python packages (5-15 minutes the first time)'
 $Py = VenvPy $Venv $false
@@ -982,7 +1009,7 @@ if (Opt 'discord') {
     $null = Run-Live $Py @('-u', '-m', 'core.kaka_u20_setup', '29') 'setup'
 }
 if (Opt 'wake') {
-    Say 'Wake word: installing Vosk and the English model...'
+    Say 'Wake word "Hey Kaka": installing Vosk and the English model (~40 MB, progress below)...'
     $null = Run-Live $Py @('-u', '-c', 'import sys; sys.path.insert(0, ''.''); from core import wake_word as w; ok, m = w.install_and_download(); print(''SETUP|wake|'' + (''ok'' if ok else ''skipped'') + ''|Wake word: '' + str(m))') 'setup'
 }
 Pop-Location

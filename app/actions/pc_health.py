@@ -37,10 +37,12 @@ def pc_health(parameters: dict, player=None) -> str:
 TOOL = {
     "name": "pc_health",
     "description": (
-        "His PC's health: battery %/charging/time left, CPU %, RAM used/total, C: and F: free "
+        "Quick PC stats: battery %/charging/time left, CPU %, RAM used/total, C: and F: free "
         "space, top 3 apps by RAM/CPU, CPU/GPU temperature. 'battery kitni hai' -> focus=battery; "
-        "'RAM kitni use ho rahi' -> ram; 'PC garam hai kya' -> temp; 'PC slow kyun hai' -> slow; "
-        "'disk/storage kitna bacha' -> disk; 'PC kaisa hai' -> all. Read-only, never ask first."
+        "'RAM kitni use ho rahi' -> ram; 'PC garam hai kya' -> temp; "
+        "'disk/storage kitna bacha' -> disk; 'PC kaisa hai' -> all. Read-only, never ask first. "
+        "For a FULL check-up ('PC check karo', 'PC slow kyun hai' with tips) or junk cleaning "
+        "use pc_doctor instead."
     ),
     "parameters": {
         "type": "OBJECT",

@@ -105,8 +105,17 @@ def save_voice(voice_name: str) -> None:
 
 
 def get_wake_word_enabled() -> bool:
-    """Whether local wake-word gating is on (assistant sleeps until 'Hey Jarvis')."""
-    return load_api_keys().get("wake_word_enabled", False)
+    """Whether local wake-word gating is on (assistant sleeps until 'Hey Kaka').
+    KAKA v1.1: ON by default when the wake model is installed (Setup downloads
+    it); a saved choice in Settings always wins; no model -> off (old behaviour)."""
+    v = load_api_keys().get("wake_word_enabled", None)
+    if v is not None:
+        return bool(v)
+    try:
+        from core.wake_word import is_ready
+        return bool(is_ready())
+    except Exception:
+        return False
 
 
 def save_wake_word_enabled(enabled: bool) -> None:

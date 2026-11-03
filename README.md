@@ -20,20 +20,21 @@
 
 1. [What Kaka is](#what-kaka-is)
 2. [Screenshots](#screenshots)
-3. [Features](#features)
-4. [Voice commands (examples)](#voice-commands-examples)
-5. [Hotkeys](#hotkeys)
-6. [The two menus: SETUP and CONTROLS](#the-two-menus-setup-and-controls)
-7. [Discord phone remote](#discord-phone-remote)
-8. [Requirements](#requirements)
-9. [API keys (all free to start)](#api-keys-all-free-to-start)
-10. [Folders Kaka creates](#folders-kaka-creates)
-11. [Install, step by step](#install-step-by-step)
-12. [Discord bot setup](#discord-bot-setup)
-13. [Optional parts (face, gestures, wake word, recording)](#optional-parts-face-gestures-wake-word-recording)
-14. [Troubleshooting](#troubleshooting)
-15. [Project structure](#project-structure)
-16. [Privacy and safety](#privacy-and-safety)
+3. [New features (v1.1)](#new-features-v11)
+4. [Features](#features)
+5. [Voice commands (examples)](#voice-commands-examples)
+6. [Hotkeys](#hotkeys)
+7. [The two menus: SETUP and CONTROLS](#the-two-menus-setup-and-controls)
+8. [Discord phone remote](#discord-phone-remote)
+9. [Requirements](#requirements)
+10. [API keys (all free to start)](#api-keys-all-free-to-start)
+11. [Folders Kaka creates](#folders-kaka-creates)
+12. [Install, step by step](#install-step-by-step)
+13. [Discord bot setup](#discord-bot-setup)
+14. [Optional parts (face, gestures, wake word, recording)](#optional-parts-face-gestures-wake-word-recording)
+15. [Troubleshooting](#troubleshooting)
+16. [Project structure](#project-structure)
+17. [Privacy and safety](#privacy-and-safety)
 
 ---
 
@@ -78,14 +79,46 @@ Full-size: [SETUP menu](docs/screenshots/menu-setup.png) · [CONTROLS menu](docs
 
 ---
 
+## New features (v1.1)
+
+Twelve upgrades in one update. Every feature is its own file in `app/`, so if one cannot load (a missing package, no internet) the rest of Kaka keeps working. Kaka still **asks before anything that sends, deletes, buys, posts or installs**.
+
+**1. "Hey Kaka" wake word** - Kaka sleeps until it hears "Hey Kaka" (or just "Kaka"), beeps, the HUD lights up, and you talk normally. After 45 seconds of silence it sleeps again. Fully offline (small Vosk model, ~40 MB, downloaded by Setup with a progress bar), very low CPU. On by default once the model is installed; turn it off in Customise > **v1.1 FEATURES** or CONTROLS > **WAKE WORD**. If the model is missing, Kaka just listens all the time like before.
+
+**2. Screen explain (detailed)** - "ye screen dekh", "screen pe kya hai", "ye error kya hai", "look at my screen". Kaka takes a screenshot (kept in memory only, never saved), sends it with your question to Gemini vision (your own key) and explains it properly: what is on screen, what it means, and what to do next.
+
+**3. Detailed answers** - Questions and normal conversation now get full answers (usually 4-8 sentences, with the why and an example) in your language: Hinglish, Bengali or English. Plain commands like "Chrome kholo" still get a short "Khol diya".
+
+**4. Your city** - Weather and the morning brief use your city, not always Kolkata. Setup asks "Aapka city kaunsa hai?". Change it any time: Customise > **YOUR CITY**, or say "Kaka, mera city Delhi kar do" / "set my city to Pune".
+
+**5. Kaka uses your PC by itself** - "WhatsApp Web khol ke Rahul ko msg likh do", "YouTube pe lofi laga do, khud chala ke", "Notepad khol ke shopping list likh do". Kaka looks at the screen, moves the mouse and types, step by step (max 15 steps), and every step shows in the HUD log. **Before pressing Send / Delete / Buy / Post / Install it stops and asks** (say "haan", or press CONFIRM on the HUD). Stop it any time: **Esc**, "ruk jao Kaka", or move the mouse into a screen corner.
+
+**6. Memory that remembers your days** - "yaad rakhna Didi ka birthday 5 March hai", "mere baare mein kya yaad hai?", "ye bhool jao", and now also "kal kya baat hui thi?" / "what did we talk about yesterday?". Kaka saves a short summary of each day's conversation on your PC (`Data\Conversations`) and remembers the last few days. View or clear it in Customise > **v1.1 FEATURES** > VIEW MEMORY / CLEAR MEMORY. It goes nowhere except into Kaka's own Gemini prompt.
+
+**7. PC doctor + junk cleaner** - "PC slow kyun hai?", "PC check karo", "full checkup": CPU, RAM, the heaviest apps, free space on every drive, temperatures (when Windows reports them), how long the PC has been on and how many apps start with Windows, then a clear diagnosis with tips. "Junk saaf karo": Kaka measures TEMP, Windows Temp, the Recycle Bin and browser caches, **tells you the size and asks** before deleting. Python, uv, .venv, Git and Kaka folders are never touched.
+
+**8. Auto-update** - Once a day at start (or "Kaka update check karo") Kaka checks GitHub. If there is a newer version it asks "Naya version aaya hai, update karu?". On yes it downloads only the changed files, checks every file's sha256, backs up the old files to `Data\Backups`, replaces them and restarts. Your keys, name and city are never touched. On/off in Customise > **v1.1 FEATURES** > Auto-update (or "auto update band karo").
+
+**9. Music control** - "next gaana", "pichla gaana", "pause", "play", "volume kam karo / badhao", "mute", "YouTube pe Kesariya chalao", "Spotify pe Arijit Singh chalao". Media keys work for whatever is playing.
+
+**10. Morning brief** - At the first Kaka start of the day (or 8 AM if Kaka is already running), or when you say "aaj ka brief do": greeting by your name, weather for your city, today's reminders, your open notes, birthdays, a line from yesterday's diary, FC Barcelona and 5 India headlines (Google News, no key). On/off: Customise > **v1.1 FEATURES** > Morning brief, or "morning brief band karo".
+
+**11. Personality modes** - "funny mode", "strict teacher mode", "bhai mode", "normal mode" (or the dropdown in Customise > **v1.1 FEATURES**). Kaka remembers the mode. With the Gemini voice, each mode also has its own voice.
+
+**12. Diary** - "diary mein likho aaj gym gaya", "kal kya likha tha?", "diary padho", "diary mein Rahul dhoondo", "5 November ki diary". Dated entries saved on your PC (`Data\diary.json`). "Kal wali entry delete karo" asks first. Quick to-dos still go to the notes panel ("note karo ...").
+
+Already installed Kaka? Run **Kaka-Features.bat** once (it backs up every file it changes, installs the wake model, asks your city and restarts Kaka). From now on, auto-update does it for you.
+
+---
+
 ## Features
 
 | Feature | What it does |
 |---|---|
 | **Voice + AI fallback** | Gemini Live listens and speaks. If Gemini hits its limit, Kaka moves down the brain chain (below). |
 | **Brain chain** | Gemini (main key, plus up to 4 more Gemini keys) → Groq → Mistral → NVIDIA NIM → OpenRouter → Cohere → Cloudflare / SambaNova → 6 custom slots (any OpenAI-compatible API). Order and keys are set in SETUP → API KEYS / ENGINE PROVIDERS. |
-| **Wake word** | Say "Kaka" (also "hey Kaka", "okay Kaka"). Offline, using a small Vosk model downloaded once (about 40 MB). |
-| **Hinglish** | Talk in Hinglish, English, or Bengali in English letters. Kaka answers in short Hinglish. |
+| **Wake word** | Say "Hey Kaka" (or "Kaka", "okay Kaka"). Sleeps again after 45 s of silence. Offline, using a small Vosk model downloaded once by Setup (about 40 MB). On by default when the model is installed. |
+| **Hinglish** | Talk in Hinglish, English, or Bengali in English letters. Kaka answers in your language: detailed answers to questions, a short line for commands. |
 | **Confirm rule** | Before anything that sends, deletes, buys, posts, installs or overwrites, Kaka asks once. A direct "call lagao" rings without asking. |
 | **Two HUD looks** | Reactor Core (full HUD) and Minimal sphere. Switch in CONTROLS → HUD. |
 | **WhatsApp** | Calls and messages through the WhatsApp desktop app. It checks the chat name before calling, so a wrong chat means no call. |
@@ -94,16 +127,16 @@ Full-size: [SETUP menu](docs/screenshots/menu-setup.png) · [CONTROLS menu](docs
 | **YouTube** | Opens the first real video in your browser, then controls it with YouTube's own keys. |
 | **VS Code helper** | Runs the open file, explains errors, suggests a fix and asks before writing (keeps a `.bak`). C, C++, Python, Java, JS and Node. |
 | **Apps and files** | Opens desktop apps first (not the browser). A file finder indexes your drives every 30 minutes. |
-| **PC control** | Exact volume, mute, brightness, media keys, lock, sleep. Shutdown and restart need a confirm. |
-| **PC health** | Battery, CPU, RAM, disk, top apps, GPU temperature. Low-battery alerts at 20% and 10%. |
+| **PC control** | Exact volume, mute, brightness, media keys, lock, sleep. Shutdown and restart need a confirm. New: Kaka can use the mouse and keyboard by itself for multi-step tasks (asks before Send / Delete / Buy / Post / Install; Esc stops). |
+| **PC health / PC doctor** | Battery, CPU, RAM, every drive, top apps, temperatures, uptime, startup apps, with a diagnosis and tips. Junk cleaner (asks first). Low-battery alerts at 20% and 10%. |
 | **Reminders and alarms** | Beep + popup + voice, even when Kaka is asleep. Saved, so they survive a restart. |
 | **Timer, stopwatch, pomodoro** | Countdown on the HUD. |
-| **Notes panel** | An always-on-top notes card in the top-right corner. Ctrl+2 shows or hides it. |
+| **Notes panel + diary** | An always-on-top notes card in the top-right corner (Ctrl+2 shows or hides it), and a dated diary you can search by day or word. |
 | **Clipboard memory** | The last 20 text copies. Passwords, OTPs and API keys are skipped. |
-| **Memory** | "yaad rakhna …" saves a fact that Kaka uses in every chat. View, edit or clear it in SETUP → MEMORY. |
+| **Memory** | "yaad rakhna …" saves a fact that Kaka uses in every chat, plus a short summary of each day's conversation ("kal kya bola tha?"). View, edit or clear it in SETUP → MEMORY and Customise → v1.1 FEATURES. |
 | **Screenshot** | Saved to `Data\Screenshots`. Can also send it on WhatsApp (asks first). |
-| **Screen explain + translate** | "ye error kya hai", "screen ka text Bengali mein": uses Gemini vision with your key. |
-| **Morning brief** | Every day at 8:00 AM, or when you ask: weather (Kolkata by default), FC Barcelona's last result and next match in IST, and 3 India headlines. On/off in CONTROLS. |
+| **Screen explain + translate** | "ye screen dekh", "ye error kya hai", "screen ka text Bengali mein": uses Gemini vision with your key and explains in detail. |
+| **Morning brief** | First Kaka start of the day (or 8:00 AM), or when you ask: weather for your city, reminders, notes, birthdays, FC Barcelona's last result and next match in IST, and 5 India headlines. On/off in CONTROLS or Customise → v1.1 FEATURES. |
 | **Weather, news, football** | Live sources: Open-Meteo, ESPN, Google News. |
 | **Game mode** | Turns on by itself in full-screen games (or by voice). Kaka goes quiet, the mic is muted and reminders wait. Alarms still ring. |
 | **Sleep mode** | Ctrl+1 or the SLEEP button. Kaka stops listening and stays quiet until you wake it. |
@@ -118,6 +151,9 @@ Full-size: [SETUP menu](docs/screenshots/menu-setup.png) · [CONTROLS menu](docs
 | **Timing log** | Each task's time goes to `Data\kaka-timing.txt` (say "timing"). |
 | **Kaka.exe launcher** | Starts Kaka without a black console window, autostarts at Windows login from the Startup folder (no admin), and has `--restart`, `--stop` and `--voice-toggle`. |
 | **K logo everywhere** | The window, taskbar, Kaka.exe, shortcuts, dashboard and the Discord bot's photo. |
+| **Your city** | Set in Setup, Customise → YOUR CITY, or "mera city Delhi kar do". Used for weather and the morning brief. |
+| **Personality modes** | Normal, funny, strict teacher, bhai. Remembered across restarts. |
+| **Auto-update** | Checks GitHub once a day, asks before updating, verifies sha256, keeps a backup, restarts. |
 
 ---
 
@@ -136,14 +172,20 @@ Say "Kaka" first (or press the HUD mic button, or type in the box at the bottom)
 | "Chrome kholo" · "VS Code kholo" · "meri resume file kholo" | Apps and files |
 | "ye file run karo" · "error fix karo" · "C mein calculator likho" | VS Code helper |
 | "battery kitni hai" · "PC slow kyun hai" · "PC garam hai kya" | PC health |
+| "PC check karo" · "junk saaf karo" (asks first) | PC doctor + junk cleaner |
+| "WhatsApp Web khol ke Rahul ko msg likh do" · "ruk jao Kaka" | Kaka uses the PC itself (asks before Send) |
+| "funny mode" · "bhai mode" · "strict teacher mode" · "normal mode" | Personality modes |
+| "mera city Delhi kar do" · "set my city to Pune" | Your city |
+| "Kaka update check karo" · "auto update band karo" | Auto-update |
 | "10 minute baad chai yaad dilana" · "kal subah 7 baje alarm" · "mere reminders batao" | Reminders and alarms |
 | "25 minute ka timer" · "stopwatch shuru" · "pomodoro shuru" | Timers |
 | "note karo doodh lana hai" · "mere notes padho" · "note 2 ho gaya" | Notes panel |
+| "diary mein likho aaj gym gaya" · "kal kya likha tha?" · "diary mein Rahul dhoondo" | Diary |
 | "jo copy kiya tha woh batao" · "3 copy pehle wala" · "clipboard saaf karo" | Clipboard memory |
-| "yaad rakhna Didi ka birthday 5 March hai" · "kya yaad hai mere baare mein" · "ye bhool jao" | Memory |
+| "yaad rakhna Didi ka birthday 5 March hai" · "kya yaad hai mere baare mein" · "ye bhool jao" · "kal kya baat hui thi?" | Memory |
 | "screenshot lo" · "screenshot lo aur Didi ko WhatsApp pe bhejo" | Screenshot |
-| "ye error kya hai" · "screen ka text Bengali mein batao" | Screen explain / translate |
-| "aaj ka update" · "morning update band karo" / "chalu karo" | Morning brief |
+| "ye screen dekh" · "ye error kya hai" · "look at my screen" · "screen ka text Bengali mein batao" | Screen explain / translate |
+| "aaj ka brief do" · "aaj ka update" · "morning brief band karo" / "chalu karo" | Morning brief |
 | "kal barish hogi?" · "news sunao" · "Barca ka score" | Weather, news, football |
 | "game mode on" / "off" | Game mode |
 | "boot intro band karo" / "chalu karo" | Boot intro |
@@ -280,6 +322,9 @@ C:\Kaka\                       <- any drive / folder you like (this repository g
 ├── .venv\                     <- Python 3.13 virtual environment
 ├── Data\                      <- everything Kaka saves (made on first run)
 │   ├── notes.json, reminders.json, memory.json, clipboard.json
+│   ├── diary.json, selfupdate.json
+│   ├── Conversations\         <- one file per day + summaries.json (v1.1 memory)
+│   ├── Backups\               <- old files kept by auto-update
 │   ├── morning.json, game_mode.json, gestures.json, boot_intro.json
 │   ├── discord.json           <- your Discord user id + alarm channel
 │   ├── Screenshots\  Recordings\  Uploads\  Saved\  Projects\  Reminders\
@@ -493,6 +538,19 @@ Kaka/                          (clone this into your install folder, e.g. C:\Kak
     ├── kaka_keys_ui.py        the API KEYS panel
     ├── kaka_paths.py          where Kaka saves things (Data folder)
     ├── kaka_tools.py          settings helper: python kaka_tools.py status / voice gemini|brian|toggle
+    ├── VERSION                app version (auto-update compares it with GitHub)
+    ├── update-manifest.json   sha256 of every app file (auto-update checks each download)
+    ├── kaka_v11.py            v1.1 hub: city / personality / recent days in the prompt
+    ├── kaka_user.py           your name and city (config/api_keys.json)
+    ├── kaka_persona.py        personality modes
+    ├── kaka_daylog.py         daily conversation summaries ("kal kya bola tha")
+    ├── kaka_diary.py          the dated diary
+    ├── kaka_doctor.py         PC doctor check-up
+    ├── kaka_junk.py           junk cleaner (measures, asks, then cleans)
+    ├── kaka_selfupdate.py     auto-update from GitHub
+    ├── kaka_pcagent.py        Kaka uses the mouse and keyboard by itself
+    ├── kaka_brief.py          morning brief extras
+    ├── kaka_features_ui.py    Customise > v1.1 FEATURES window
     ├── setup.py               installs the Python packages
     ├── requirements.txt
     ├── actions/               tools Kaka can use (~45): WhatsApp, Spotify,

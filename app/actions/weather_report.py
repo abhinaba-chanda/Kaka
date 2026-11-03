@@ -3,8 +3,9 @@ actions/weather_report.py - Kaka update 18: real weather, spoken (it used to
 only open a Google search in the browser).
 
 Open-Meteo (keyless): now + today's min/max + rain chance, or tomorrow's
-("kal barish hogi?"). City is optional - default Kolkata; any other city is
-geocoded by Open-Meteo's keyless geocoding API.
+("kal barish hogi?"). City is optional - default is the user's own city
+(v1.1: Setup / Settings > Customise / "mera city Delhi kar do"); any other
+city is geocoded by Open-Meteo's keyless geocoding API.
 """
 from __future__ import annotations
 
@@ -31,7 +32,7 @@ def weather_action(parameters: dict = None, player=None, session_memory=None) ->
         from core import kaka_services as ks
         if ok:
             ks.popup("Mausam", msg)
-        ks.timing("weather_report", time.monotonic() - t0, city or "Kolkata")
+        ks.timing("weather_report", time.monotonic() - t0, city or "my city")
     except Exception:
         pass
     if player:
@@ -48,12 +49,13 @@ TOOL = {
     "description": (
         "Live weather, spoken: 'aaj mausam kaisa hai', 'bahar garmi hai?', 'kal barish hogi?', "
         "'Delhi ka mausam'. Gives temperature now, today's min/max and rain chance, or "
-        "tomorrow's forecast. City optional (default Kolkata). Never opens a browser."
+        "tomorrow's forecast. City optional (default: the user's own saved city). Never opens a browser. "
+        "To CHANGE his saved city ('mera city Delhi kar do') use kaka_city instead."
     ),
     "parameters": {
         "type": "OBJECT",
         "properties": {
-            "city": {"type": "STRING", "description": "City name; leave empty for Kolkata"},
+            "city": {"type": "STRING", "description": "City name; leave empty for the user's own city"},
             "when": {"type": "STRING", "enum": ["today", "now", "tomorrow"],
                      "description": "today (default) | now | tomorrow ('kal')"},
         },

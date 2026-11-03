@@ -270,7 +270,7 @@ def capture(mode: str = "window") -> tuple:
     if not png:
         info["error"] = "screenshot nahi le paaya (" + "; ".join(errs)[:200] + ")"
         return None, "", info
-    img, mime = to_jpeg(png)
+    img, mime = to_jpeg(png, MAX_SIDE)     # KAKA v1.1: MAX_SIDE read at call time
     del png
     info["bytes"] = len(img)
     info["secs"] = round(time.monotonic() - t0, 2)

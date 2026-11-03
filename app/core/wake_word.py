@@ -140,6 +140,9 @@ def is_ready() -> bool:
 
 
 def _download_vosk_model(logger, tell) -> tuple[bool, str]:
+    """KAKA v1.1: streamed download with live progress (printed as
+    'Wake model: 12.3 / 39.3 MB (31%)' lines, which Setup shows as it goes),
+    a retry, and the zip checked before it is unpacked."""
     import io
     import urllib.request
     import zipfile
@@ -147,11 +150,41 @@ def _download_vosk_model(logger, tell) -> tuple[bool, str]:
     dest_root.mkdir(parents=True, exist_ok=True)
     logger("Wake word: downloading the Kaka model (40 MB, one-time)…")
     tell("Wake word: downloading the Kaka model (40 MB, one-time)…")
-    with urllib.request.urlopen(VOSK_MODEL_URL, timeout=120) as r:
-        data = r.read()
-    with zipfile.ZipFile(io.BytesIO(data)) as z:
-        z.extractall(dest_root)
-    return (vosk_model_dir() is not None), "model downloaded"
+    last_err = None
+    for attempt in (1, 2, 3):
+        try:
+            req = urllib.request.Request(VOSK_MODEL_URL, headers={"User-Agent": "Kaka-setup"})
+            buf = io.BytesIO()
+            with urllib.request.urlopen(req, timeout=60) as r:
+                total = int(r.headers.get("Content-Length") or 0)
+                got, step = 0, -1
+                while True:
+                    chunk = r.read(256 * 1024)
+                    if not chunk:
+                        break
+                    buf.write(chunk)
+                    got += len(chunk)
+                    pct = int(100 * got / total) if total else 0
+                    if total and pct // 5 != step:
+                        step = pct // 5
+                        msg = (f"Wake model: {got / 1048576:.1f} / {total / 1048576:.1f} MB "
+                               f"({pct}%)")
+                        print(msg, flush=True)
+                        tell(msg)
+            data = buf.getvalue()
+            if total and len(data) != total:
+                raise IOError(f"incomplete download ({len(data)} of {total} bytes)")
+            with zipfile.ZipFile(io.BytesIO(data)) as z:
+                bad = z.testzip()
+                if bad:
+                    raise IOError(f"zip damaged at {bad}")
+                z.extractall(dest_root)
+            return (vosk_model_dir() is not None), "model downloaded"
+        except Exception as e:          # noqa: BLE001
+            last_err = e
+            print(f"Wake model: try {attempt} failed ({e}), retrying...", flush=True)
+            time.sleep(2 * attempt)
+    raise last_err if last_err else IOError("download failed")
 
 
 def install_and_download(logger: Callable[[str], None] = print,

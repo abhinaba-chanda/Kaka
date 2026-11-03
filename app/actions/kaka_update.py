@@ -34,15 +34,15 @@ def kaka_update(parameters: dict = None, player=None) -> str:
             from core import kaka_feeds as f
         if action in ("morning_off", "off", "band"):
             ok = f.set_enabled(False)
-            msg = ("Theek hai, roz subah 8 baje wala update band kar diya." if ok else
+            msg = ("Theek hai, roz subah wala brief band kar diya." if ok else
                    "Morning update band karna save nahi ho paya (Data folder mein likh nahi saka).")
         elif action in ("morning_on", "on", "chalu"):
             ok = f.set_enabled(True)
-            msg = ("Morning update chalu: roz subah 8 baje (PC band ho toh 11 baje tak pehli baar "
-                   "khulne par) sunaunga." if ok else
+            msg = ("Morning brief chalu: roz din mein pehli baar Kaka khulne par (ya subah 8 baje) "
+                   "sunaunga." if ok else
                    "Morning update chalu karna save nahi ho paya (Data folder mein likh nahi saka).")
         elif action == "status":
-            msg = ("Morning update chalu hai, roz subah 8 baje." if f.is_enabled()
+            msg = ("Morning brief chalu hai, roz pehli baar Kaka khulne par." if f.is_enabled()
                    else "Morning update abhi band hai.")
         elif action == "news":
             msg = f.news_text(f.news(3))
@@ -56,7 +56,7 @@ def kaka_update(parameters: dict = None, player=None) -> str:
             msg, _st = f.compose_morning()
             if ks:
                 ks.popup("Aaj ka update", msg)
-            msg += " (Ye sab sunao, chhote vakyon mein.)"
+            msg += " (Ye poora brief sunao - har point, natural Hinglish mein.)"
     except Exception as e:
         msg = f"Update laane mein dikkat aayi ({type(e).__name__}), thodi der baad try karo."
     if ks:
@@ -67,10 +67,11 @@ def kaka_update(parameters: dict = None, player=None) -> str:
 TOOL = {
     "name": "kaka_update",
     "description": (
-        "Kaka's live update: 'aaj ka update' / 'morning update' (weather + Barca + India news "
-        "in one go), 'news sunao' (top India headlines), 'Barca ka score' (live score if a "
-        "match is on, else last result + next match in IST), and turning the daily 8 AM "
-        "morning update on/off ('morning update band karo / chalu karo'). Read-only, never "
+        "Kaka's live update / morning brief: 'aaj ka update' / 'aaj ka brief do' / 'morning brief' / "
+        "'morning update' (greeting + weather for his city + reminders/notes/birthdays + Barca + "
+        "India news in one go), 'news sunao' (top India headlines), 'Barca ka score' (live score if a "
+        "match is on, else last result + next match in IST), and turning the daily morning "
+        "brief on/off ('morning brief / update band karo / chalu karo'). Read-only, never "
         "ask a question before it. Weather alone goes to weather_report."
     ),
     "parameters": {

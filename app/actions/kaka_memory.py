@@ -16,6 +16,14 @@ def kaka_memory(parameters: dict, player=None) -> str:
     p = parameters or {}
     action = str(p.get("action") or "remember").lower()
     try:
+        if action in ("day", "conversation", "kal"):   # KAKA v1.1: "kal kya bola tha"
+            try:
+                import kaka_daylog
+                txt = kaka_daylog.recall(str(p.get("when") or p.get("fact") or "kal"))
+            except Exception as e:
+                txt = f"Purani baatein padh nahi paya: {e}"
+            ks.timing("memory day", time.monotonic() - t0)
+            return txt + " (Tell him this naturally, in detail if he asks.)"
         if action in ("list", "recall", "show"):
             lines = F.summary_lines()
             ks.timing("memory list", time.monotonic() - t0)
@@ -64,12 +72,15 @@ TOOL = {
         "His personal facts, saved forever: 'yaad rakhna Didi ka birthday 5 March hai', "
         "'mujhe biryani pasand hai' -> action=remember, fact=<short sentence>. "
         "'kya yaad hai mere baare mein' -> action=list. 'ye bhool jao' / '<x> wali baat bhool jao' "
-        "-> action=forget (asks once; go_ahead=true after haan)."
+        "-> action=forget (asks once; go_ahead=true after haan). "
+        "'kal kya baat hui thi' / 'kal kya bola tha' / 'parso kya discuss kiya' / 'what did we "
+        "talk about yesterday' -> action=day, when=kal / parso / '5 November' / aaj."
     ),
     "parameters": {
         "type": "OBJECT",
         "properties": {
-            "action": {"type": "STRING", "enum": ["remember", "list", "forget"]},
+            "action": {"type": "STRING", "enum": ["remember", "list", "forget", "day"]},
+            "when": {"type": "STRING", "description": "For action=day: kal / parso / aaj / '5 November'"},
             "fact": {"type": "STRING", "description": "The fact in a short sentence (remember) or which one (forget)"},
             "category": {"type": "STRING", "enum": ["birthday", "pasand", "napasand", "general"]},
             "person": {"type": "STRING", "description": "For a birthday: whose (e.g. 'Didi')"},

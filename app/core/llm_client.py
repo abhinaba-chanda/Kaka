@@ -246,7 +246,7 @@ def call_llm(
             "model":      model,
             "messages":   messages,
             "stream":     False,
-            "max_tokens": 150,
+            "max_tokens": 700,       # KAKA v1.1: detailed answers (was 150 = cut-off one-liners)
         }
         if tools:
             payload["tools"]       = tools

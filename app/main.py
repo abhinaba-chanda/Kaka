@@ -98,7 +98,7 @@ from core.wake_word            import (
 
 # How long the assistant stays awake with no user speech before it auto-sleeps
 # again (wake-word mode only).
-WAKE_SLEEP_TIMEOUT = 120.0   # seconds (2 minutes)
+WAKE_SLEEP_TIMEOUT = 45.0    # seconds (KAKA v1.1: was 2 minutes; "Hey Kaka" wakes it again)
 
 def get_base_dir():
     if getattr(sys, "frozen", False):
@@ -883,7 +883,7 @@ class JarvisLive:
             if speaking:
                 continue
             if (time.monotonic() - self._last_user_speech) > self._wake_sleep_timeout:
-                self.sleep(reason="no speech for 2 minutes")
+                self.sleep(reason=f"{int(self._wake_sleep_timeout)} s se koi baat nahi")
 
     # ── update 13: SLEEP MODE ───────────────────────────────────────────────
     def _start_sleep_hotkey(self) -> None:
@@ -1391,6 +1391,13 @@ class JarvisLive:
         })
 
         parts = [time_ctx, identity_ctx]
+        try:                                   # KAKA v1.1: city, personality, recent days
+            import kaka_v11 as _kv11
+            _v11 = _kv11.prompt_extras()
+            if _v11:
+                parts.append(_v11)
+        except Exception as _e:
+            print(f"[KAKA] v1.1 prompt extras skipped: {_e}")
         if mem_str:
             parts.append(mem_str)
         parts.append(sys_prompt)
@@ -2027,6 +2034,11 @@ class JarvisLive:
                                 if self._engine is None:
                                     self.ui.write_log(f"You: {full_in}")
                                 self._session_log.append(f"User: {full_in}")
+                                try:           # KAKA v1.1: "kal kya bola tha" memory
+                                    import kaka_daylog as _kdl
+                                    _kdl.add("user", full_in)
+                                except Exception:
+                                    pass
                                 if self._dashboard:
                                     asyncio.create_task(self._dashboard.broadcast({
                                         "type": "log", "speaker": "user",
@@ -2046,6 +2058,11 @@ class JarvisLive:
                                 self._last_out_logged = full_out
                                 self.ui.write_log(f"{self._asst_name}: {full_out}")
                                 self._session_log.append(f"{self._asst_name}: {full_out}")
+                                try:           # KAKA v1.1: "kal kya bola tha" memory
+                                    import kaka_daylog as _kdl
+                                    _kdl.add("kaka", full_out)
+                                except Exception:
+                                    pass
                                 if self._dashboard:
                                     asyncio.create_task(self._dashboard.broadcast({
                                         "type": "log", "speaker": "jarvis",
@@ -2868,8 +2885,16 @@ class JarvisLive:
 
                     # Wake word: if enabled, come up ASLEEP (mic gated, silent)
                     # until the user says "Hey Jarvis" or taps wake in the UI.
+                    _kaka_wake_ok = False
                     if self._wake_enabled:
-                        self._ensure_wake_detector()
+                        try:                   # KAKA v1.1: no model -> stay awake (old behaviour)
+                            _kaka_wake_ok = bool(self._ensure_wake_detector())
+                        except Exception as _e:
+                            print(f"[Wake] detector failed: {_e}")
+                        if not _kaka_wake_ok:
+                            self.ui.write_log("SYS: Wake word model nahi mila - "
+                                              "bina 'Hey Kaka' ke sun raha hoon.")
+                    if self._wake_enabled and _kaka_wake_ok:
                         self._awake = False
                         self.ui.set_state("SLEEPING")
                         self.ui.write_log(f"SYS: {getattr(self, '_asst_name', 'KAKA')} online — sleeping. Say 'Kaka' to wake me.")

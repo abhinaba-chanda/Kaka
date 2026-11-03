@@ -154,9 +154,25 @@ def parse_geocode(js) -> Optional[tuple]:
         return None
 
 
+def _user_city() -> str:               # KAKA v1.1: the user's city (kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "Kolkata"
+    try:
+        return kaka_user.user_city()
+    except Exception:
+        return "Kolkata"
+
+
 def geocode(city: str) -> Optional[tuple]:
     from urllib.parse import quote
-    c = (city or "").strip()
+    c = (city or "").strip() or _user_city()   # KAKA v1.1: empty = his city
     if not c or c.lower() in ("kolkata", "calcutta", "kolkatta", "kol"):
         return KOLKATA
     return parse_geocode(_get_json(URL_GEOCODE.format(name=quote(c))))
@@ -172,7 +188,7 @@ def weather(city: str = "") -> Optional[dict]:
     w = parse_forecast(_get_json(URL_FORECAST.format(lat=lat, lon=lon)))
     if w is None:
         return None
-    w["place"] = name or city or "Kolkata"
+    w["place"] = name or city or _user_city()
     return w
 
 
@@ -215,7 +231,7 @@ def weather_text(w: Optional[dict], when: str = "today") -> str:
         return "Mausam ki jaankari abhi nahi mili (internet/Open-Meteo jawab nahi diya)."
     if w.get("error") == "city":
         return f"'{w.get('place')}' naam ki jagah nahi mili, mausam nahi bata paya."
-    place = w.get("place") or "Kolkata"
+    place = w.get("place") or _user_city()
     days = w.get("days") or []
     if when == "tomorrow":
         if len(days) < 2:
@@ -517,12 +533,24 @@ def compose_morning(now: Optional[datetime] = None) -> tuple:
     """-> (text, stats dict). All sources in parallel, hard ~5.5 s bound."""
     t0 = time.monotonic()
     now = now or _now()
-    r = parallel({"weather": lambda: weather(""), "news": lambda: news(3),
+    try:                                   # KAKA v1.1: 5 headlines
+        import kaka_brief as _kb
+        _nh = int(_kb.HEADLINES)
+    except Exception:
+        _kb, _nh = None, 3
+    r = parallel({"weather": lambda: weather(""), "news": lambda: news(_nh),
                   "barca": lambda: barca()})
     lines = [greeting(now) + f" Aaj {_DAYS[now.weekday()]}, {now.day} {_MON[now.month - 1]}."]
     lines.append(weather_text(r["weather"], "today") if r["weather"] else "Mausam nahi mila.")
+    _extra = []
+    try:                                   # KAKA v1.1: reminders, notes, birthdays, diary
+        if _kb is not None:
+            _extra = _kb.extras(now)
+    except Exception:
+        _extra = []
+    lines.extend(_extra)
     ga = google_access()
-    if not ga["calendar"]:
+    if not ga["calendar"] and not _extra:
         lines.append("Calendar connect nahi hai, isliye aaj ka plan nahi bata sakta.")
     lines.append(barca_text(r["barca"], now.date()) if r["barca"] else "Barca ki khabar nahi mili.")
     lines.append(news_text(r["news"]) if r["news"] else "News nahi mili.")
@@ -568,7 +596,7 @@ def is_enabled(s: Optional[dict] = None) -> bool:
     return bool(s.get("enabled", True))
 
 
-def due(now: datetime, s: dict) -> bool:
+def due(now: datetime, s: dict, first: bool = False) -> bool:
     """Morning update is due: enabled, not yet run today, and between 08:00 and
     11:00. Running at 8 fires at 8:00; started later (PC was off) fires on that
     first start before 11; after 11 the day is skipped."""
@@ -577,6 +605,12 @@ def due(now: datetime, s: dict) -> bool:
     if s.get("last_run") == now.strftime("%Y-%m-%d"):
         return False
     t = (now.hour, now.minute)
+    if first:                              # KAKA v1.1: first Kaka start of the day
+        try:
+            import kaka_brief as _kb
+            return _kb.first_start_due(now, s, True)
+        except Exception:
+            pass
     return MORNING_AT <= t < MORNING_UNTIL
 
 
@@ -584,7 +618,7 @@ def startup_briefing_overlaps(now: Optional[datetime] = None) -> bool:
     """For main.py: True when this start will get the morning update (so the old
     startup news briefing can skip its news part instead of doubling it)."""
     try:
-        return due(now or _now(), load_state())
+        return due(now or _now(), load_state(), first=True)
     except Exception:
         return False
 
@@ -615,12 +649,14 @@ _THREAD = {"t": None}
 def _loop(first_delay: float = 20.0, tick: float = 30.0) -> None:
     # first_delay: let the startup greeting/briefing finish before we speak
     time.sleep(first_delay)
+    first = True                           # KAKA v1.1: first check = first start of the day
     while True:
         try:
-            if due(_now(), load_state()):
+            if due(_now(), load_state(), first=first):
                 run_morning(True)
         except Exception as e:
             _log(f"SYS: morning loop error: {e}")
+        first = False
         time.sleep(tick)
 
 

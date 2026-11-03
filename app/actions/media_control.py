@@ -209,8 +209,9 @@ TOOL = {
         "'volume 40' / 'awaaz 40 karo' (volume_set, value=40), 'awaaz badhao/tez karo' (volume_up), "
         "'awaaz kam karo/dheemi' (volume_down), 'mute'/'awaaz band' (mute), 'unmute' (unmute), "
         "'brightness 70' (brightness_set), 'brightness badhao/kam' (brightness_up/down), "
-        "'video pause karo' / 'pause' (pause), 'play/resume' (play), 'next' (next), "
-        "'previous' (previous), 'stop' - media keys, for whatever is playing (YouTube in the "
+        "'video pause karo' / 'pause' / 'gaana roko' (pause), 'play/resume' / 'gaana chalu karo' "
+        "(play), 'next' / 'next gaana' / 'agla gaana' (next), 'previous' / 'pichla gaana' "
+        "(previous), 'stop' - media keys, for whatever is playing (YouTube in the "
         "browser, VLC, Spotify). Spotify song controls via play_music also fine. Never asks."
     ),
     "parameters": {

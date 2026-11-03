@@ -1677,7 +1677,7 @@ class CustomizeOverlay(QWidget):
     """Floating overlay — change assistant name, user name, UI colour and voice."""
 
     saved = pyqtSignal(str, str, str, str)   # assistant_name, user_name, ui_color, voice
-    _OW, _OH = 400, 646
+    _OW, _OH = 400, 704                # KAKA v1.1: +YOUR CITY row (was 646)
 
     def __init__(self, assistant_name="Kaka", user_name="",
                  ui_color=DEFAULT_UI_COLOR, voice="", parent=None):
@@ -1727,6 +1727,38 @@ class CustomizeOverlay(QWidget):
         self._user_input.setFixedHeight(32)
         self._user_input.setStyleSheet(_fs)
         lay.addWidget(self._user_input)
+
+        # KAKA v1.1: YOUR CITY (weather / morning brief) + the v1.1 features window
+        self._city_input = None
+        self._city_initial = ""
+        self.city_changed = False
+        try:
+            import kaka_user as _ku11
+            self._city_initial = _ku11.user_city()
+            lay.addSpacing(4)
+            lay.addWidget(_lbl("YOUR CITY  (weather isi city ka)", 8,
+                                color=C.TEXT_DIM, align=Qt.AlignmentFlag.AlignLeft))
+            _city_row = QHBoxLayout(); _city_row.setSpacing(6)
+            self._city_input = QLineEdit(self._city_initial)
+            self._city_input.setPlaceholderText("e.g.  Delhi")
+            self._city_input.setFont(QFont("Courier New", 10))
+            self._city_input.setFixedHeight(32)
+            self._city_input.setStyleSheet(_fs)
+            _city_row.addWidget(self._city_input, 1)
+            _v11_btn = QPushButton("v1.1 FEATURES")
+            _v11_btn.setFixedHeight(32)
+            _v11_btn.setFont(QFont("Courier New", 8, QFont.Weight.Bold))
+            _v11_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            _v11_btn.setStyleSheet(f"""
+                QPushButton {{ background: transparent; color: {C.PRI};
+                    border: 1px solid {C.PRI_DIM}; border-radius: 3px; padding: 0 8px; }}
+                QPushButton:hover {{ background: {C.PRI_GHO}; border: 1px solid {C.PRI}; }}
+            """)
+            _v11_btn.clicked.connect(self._open_v11_features)
+            _city_row.addWidget(_v11_btn)
+            lay.addLayout(_city_row)
+        except Exception as _e:
+            print(f"[KAKA] v1.1 city field unavailable: {_e}")
 
         # ── Assistant voice — Gemini prebuilt voices ─────────────────────────
         # Names are language-neutral proper nouns, so the row reads the same in
@@ -1932,9 +1964,25 @@ class CustomizeOverlay(QWidget):
             self.on_preview(self._initial_color)
         self.hide()
 
+    def _open_v11_features(self):
+        try:                                   # KAKA v1.1
+            import kaka_features_ui
+            kaka_features_ui.open_dialog(self.window(), C)
+        except Exception as e:
+            print(f"[KAKA] v1.1 features window failed: {e}")
+
     def _save(self):
         name = self._name_input.text().strip() or "Kaka"
         user = self._user_input.text().strip()
+        try:                                   # KAKA v1.1: YOUR CITY
+            if self._city_input is not None:
+                _c = self._city_input.text().strip()
+                if _c and _c != self._city_initial:
+                    import kaka_user as _ku11
+                    _ku11.save_user_city(_c)
+                    self.city_changed = True
+        except Exception as _e:
+            print(f"[KAKA] city not saved: {_e}")
         self.saved.emit(name, user, self._sel_color or DEFAULT_UI_COLOR, self._sel_voice)
         self.hide()
 
@@ -6936,6 +6984,13 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self._log.append_log(f"ERR: Config save failed — {e}")
 
+        try:                                   # KAKA v1.1: new city -> new session
+            if getattr(self._customize_overlay, "city_changed", False):
+                self._customize_overlay.city_changed = False
+                _kaka_name_changed = True
+                self._log.append_log("SYS: City updated")
+        except Exception:
+            pass
         if (voice_changed or locals().get("_kaka_name_changed")) and self.on_voice_change:   # KAKA: new name -> new session
             self.on_voice_change()
 
