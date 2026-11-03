@@ -2,7 +2,7 @@
 setlocal
 title KAKA by Abhinaba Chanda - Setup
 rem ------------------------------------------------------------------------
-rem  Kaka-Setup.bat - one-file installer for "Kaka by Abhinaba Chanda"
+rem  Kaka-Setup-V1.1.bat - one-file installer for "Kaka by Abhinaba Chanda"
 rem  https://github.com/abhinaba-chanda/Kaka
 rem  Double-click it. It asks where to install, checks your PC, installs
 rem  Python 3.13 if needed, downloads Kaka, its packages and tools, and
