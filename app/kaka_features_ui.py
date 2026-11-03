@@ -32,7 +32,7 @@ def open_dialog(window, C=None):
     dlg = QDialog(window)
     dlg.setWindowTitle("KAKA v1.1 FEATURES")
     dlg.setModal(False)
-    dlg.setMinimumWidth(430)
+    dlg.setMinimumWidth(560)
     dlg.setStyleSheet(f"""
         QDialog {{ background: #05080b; }}
         QLabel {{ color: {text}; background: transparent; }}
@@ -177,14 +177,14 @@ def open_dialog(window, C=None):
         QTimer.singleShot(300, done)
     chk.clicked.connect(do_check)
 
-    mb = QCheckBox("Morning brief (first start of the day: weather, news, reminders, notes)")
+    mb = QCheckBox("Morning brief (first start: weather, news, reminders, notes)")
     mb.setFont(f9)
     mb.setChecked(bool(_safe(lambda: __import__("core.kaka_feeds", fromlist=["x"]).is_enabled(), True)))
     mb.toggled.connect(lambda on: (_safe(lambda: __import__("core.kaka_feeds", fromlist=["x"]).set_enabled(bool(on))),
                                    say("Morning brief " + ("ON" if on else "OFF"))))
     lay.addWidget(mb)
 
-    dl = QCheckBox("Remember our conversations (daily summary, 'kal kya bola tha')")
+    dl = QCheckBox("Remember conversations (daily summary, 'kal kya bola tha')")
     dl.setFont(f9)
     dl.setChecked(bool(get_setting("daylog_enabled", True)))
     dl.toggled.connect(lambda on: (put_setting("daylog_enabled", bool(on)),
@@ -205,7 +205,7 @@ def open_dialog(window, C=None):
     def show_text(title, body):
         d = QDialog(dlg)
         d.setWindowTitle(title)
-        d.resize(520, 460)
+        d.resize(600, 460)
         d.setStyleSheet(dlg.styleSheet())
         v = QVBoxLayout(d)
         t = QPlainTextEdit(body or "(khaali)")
