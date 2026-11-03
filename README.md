@@ -476,7 +476,7 @@ Setup logs for these go to `%USERPROFILE%\kaku-setup-logs\`.
 ```text
 Kaka/                          (clone this into your install folder, e.g. C:\Kaka)
 ├── README.md                  this file
-├── LICENSE                    CC BY-NC 4.0 (see Credits and licence)
+├── LICENSE                    CC BY-NC 4.0
 ├── Kaka-Setup.bat             one-file Windows installer
 ├── docs/
 │   ├── banner.png, kaka-logo.png
@@ -496,7 +496,6 @@ Kaka/                          (clone this into your install folder, e.g. C:\Kak
     ├── kaka_tools.py          settings helper: python kaka_tools.py status / voice gemini|brian|toggle
     ├── setup.py               installs the Python packages
     ├── requirements.txt
-    ├── LICENSE                original licence file
     ├── actions/               tools Kaka can use (~45): WhatsApp, Spotify,
     │                          YouTube, VS Code, files, reminders, notes,
     │                          screen recording, gestures, face greet,
