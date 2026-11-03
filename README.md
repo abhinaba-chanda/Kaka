@@ -34,7 +34,6 @@
 14. [Troubleshooting](#troubleshooting)
 15. [Project structure](#project-structure)
 16. [Privacy and safety](#privacy-and-safety)
-17. [Credits and licence](#credits-and-licence)
 
 ---
 
