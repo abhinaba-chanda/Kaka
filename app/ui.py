@@ -1719,10 +1719,10 @@ class CustomizeOverlay(QWidget):
         lay.addWidget(self._name_input)
 
         lay.addSpacing(4)
-        lay.addWidget(_lbl("YOUR NAME  (leave blank for default sir / efendim)", 8,
+        lay.addWidget(_lbl("YOUR NAME  (Kaka aapko isi naam se bulayega)", 8,
                             color=C.TEXT_DIM, align=Qt.AlignmentFlag.AlignLeft))
         self._user_input = QLineEdit(user_name)
-        self._user_input.setPlaceholderText("e.g.  Tony   (leave blank for auto)")
+        self._user_input.setPlaceholderText("e.g.  Rohan")
         self._user_input.setFont(QFont("Courier New", 10))
         self._user_input.setFixedHeight(32)
         self._user_input.setStyleSheet(_fs)
@@ -6922,6 +6922,8 @@ class MainWindow(QMainWindow):
         try:
             data = _read_full_config()
             data["assistant_name"] = self._assistant_name
+            _kaka_name_changed = (str(data.get("user_name") or "").strip()
+                                  != user_name.strip())   # KAKA: user name
             data["user_name"] = user_name.strip()
             if ui_color:
                 data["ui_color"] = ui_color.strip().lower()
@@ -6934,7 +6936,7 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self._log.append_log(f"ERR: Config save failed — {e}")
 
-        if voice_changed and self.on_voice_change:
+        if (voice_changed or locals().get("_kaka_name_changed")) and self.on_voice_change:   # KAKA: new name -> new session
             self.on_voice_change()
 
     def _centre_overlay(self, ov) -> None:
@@ -7446,7 +7448,7 @@ class MainWindow(QMainWindow):
     def _on_setup_done(self, key: str, os_name: str):
         os.makedirs(CONFIG_DIR, exist_ok=True)
         API_FILE.write_text(
-            json.dumps({"gemini_api_key": key, "os_system": os_name}, indent=4),
+            json.dumps(dict(_read_full_config(), gemini_api_key=key, os_system=os_name), indent=4),   # KAKA: keeps user_name
             encoding="utf-8",
         )
         self._ready = True

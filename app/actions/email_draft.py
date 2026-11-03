@@ -236,12 +236,28 @@ def write_document(parameters=None, response=None, player=None, session_memory=N
     return outcome.done("write_document", saved=str(path), opened_in=opened or "not opened")
 
 
+def _kaka_user_name() -> str:          # KAKA: user name (app/kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "dost"
+    try:
+        return kaka_user.user_name()
+    except Exception:
+        return "dost"
+
+
 TOOL = {
     "name": "draft_email",
     "description": (
         "Writes an EMAIL and opens it ready to send - never sends by itself. You "
         "write a clear subject and a polite, complete body (English unless he asks "
-        "for Hindi/Hinglish), signed 'Abhinaba'. Opens Gmail compose in the browser "
+        "for Hindi/Hinglish), signed '" + _kaka_user_name() + "'. Opens Gmail compose in the browser "
         "with To/Subject/Body filled (client='mailto' for the PC's mail app). "
         "'Rahul ko mail likho ki kal meeting 5 baje hai' -> this tool. If the email "
         "address is not known, it asks for it. Opening the draft needs no question. "

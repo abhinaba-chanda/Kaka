@@ -488,13 +488,29 @@ def google_access() -> dict:
 
 
 # ------------------------------------------------------------------ compose
+def _kaka_user_name() -> str:          # KAKA: user name (app/kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "dost"
+    try:
+        return kaka_user.user_name()
+    except Exception:
+        return "dost"
+
+
 def greeting(now: Optional[datetime] = None) -> str:
     h = (now or _now()).hour
     if h < 12:
-        return "Good morning Abhinaba!"
+        return "Good morning " + _kaka_user_name() + "!"
     if h < 17:
-        return "Namaste Abhinaba!"
-    return "Good evening Abhinaba!"
+        return "Namaste " + _kaka_user_name() + "!"
+    return "Good evening " + _kaka_user_name() + "!"
 
 
 def compose_morning(now: Optional[datetime] = None) -> tuple:

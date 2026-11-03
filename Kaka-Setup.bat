@@ -635,6 +635,33 @@ if ($Mode -eq 'uninstall') {
     Finish 0
 }
 
+# ------------------------------------------------------------------ your name (Kaka calls you by it)
+function Clean-Name ($n) {
+    $s = [string]$n
+    $s = $s -replace '[\x00-\x1f\x7f"''`{}\[\]<>\\|]', ' '
+    $s = ($s -replace '\s+', ' ').Trim()
+    if ($s.Length -gt 40) { $s = $s.Substring(0, 40).Trim() }
+    return $s
+}
+$CurName = ''
+if (Test-Path $KeysFile) {
+    try { $CurName = Clean-Name ((Get-Content -LiteralPath $KeysFile -Raw -Encoding UTF8 | ConvertFrom-Json).user_name) } catch { }
+}
+if (-not $CurName) { $CurName = Clean-Name (Get-UserEnv 'KAKA_USER_NAME') }
+$NameDefault = $CurName
+if ($env:KAKA_SETUP_NAME) { $NameDefault = Clean-Name $env:KAKA_SETUP_NAME }
+if (-not $NameDefault) { $NameDefault = Clean-Name $env:USERNAME }
+if (-not $NameDefault) { $NameDefault = 'dost' }
+Write-Host ''
+Write-Host '    Your name' -ForegroundColor White
+if ($CurName) { Info "Abhi Kaka aapko '$CurName' bulata hai. Enter dabao to yahi naam rahega." }
+$UserName = ''
+while (-not $UserName) {
+    $UserName = Clean-Name (Ask 'Aapka naam kya hai? (Kaka aapko isi naam se bulayega)' $NameDefault)
+    if (-not $UserName) { Warn 'Naam khaali nahi chalega, phir se likho.' }
+}
+Ok "Kaka aapko '$UserName' bulayega"
+
 # ------------------------------------------------------------------ STEP 2: requirements
 Step 'Checking your PC'
 $script:rows = @()
@@ -834,6 +861,26 @@ foreach ($pair in @(@('KAKA_DATA', $Data), @('KAKA_TOOLS', $Tools), @('KAKA_ROOT
     Set-UserEnv $pair[0] $pair[1]
 }
 Ok 'Kaka paths set (KAKA_DATA, KAKA_TOOLS, KAKA_ROOT)'
+
+# your name: into the settings file (kaka_user.py keeps every other setting) + a user variable
+Set-UserEnv 'KAKA_USER_NAME' $UserName
+$nameSaved = $false
+$kuPy = P2 $App 'kaka_user.py'
+if ((Test-Path $kuPy) -and $BasePy) {
+    $env:KAKA_SET_NAME = $UserName
+    try { $kuOut = (& $BasePy $kuPy 'set' 2>&1 | Out-String); $nameSaved = ($LASTEXITCODE -eq 0) -and ($kuOut -match 'NAME\|saved\|') } catch { }
+    Remove-Item env:KAKA_SET_NAME -ErrorAction SilentlyContinue
+}
+if (-not $nameSaved -and -not (Test-Path $KeysFile)) {
+    try {
+        New-Item -ItemType Directory -Force -Path (Split-Path $KeysFile) | Out-Null
+        $j = '{' + "`n" + '    "user_name": ' + (ConvertTo-Json $UserName) + "`n" + '}'
+        [IO.File]::WriteAllText($KeysFile, $j, (New-Object System.Text.UTF8Encoding $false))
+        $nameSaved = $true
+    } catch { }
+}
+if ($nameSaved) { Ok "Your name saved: $UserName (change it later in Kaka: gear > Customise > YOUR NAME)" }
+else { Warn "Your name is kept in the KAKA_USER_NAME user variable (the settings file was not changed). Kaka still uses it." }
 
 # ------------------------------------------------------------------ STEP 6: Python packages
 Step 'Python packages (5-15 minutes the first time)'

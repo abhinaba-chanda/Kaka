@@ -279,12 +279,28 @@ def _speaking() -> bool:
         return False
 
 
+def _kaka_user_name() -> str:          # KAKA: user name (app/kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "dost"
+    try:
+        return kaka_user.user_name()
+    except Exception:
+        return "dost"
+
+
 def _instruction(text: str, brief: bool = True) -> str:
     if brief:
-        return ("[KAKA_NOTICE] Abhi turant ye baat Abhinaba ko ek-do chhote Hinglish "
+        return ("[KAKA_NOTICE] Abhi turant ye baat " + _kaka_user_name() + " ko ek-do chhote Hinglish "
                 "vakyon mein bolo, apne shabdon mein, koi tool mat chalao, koi sawaal "
                 "mat poocho: " + str(text))
-    return ("[KAKA_NOTICE] Abhi ye update Abhinaba ko Hinglish mein sunao - saare "
+    return ("[KAKA_NOTICE] Abhi ye update " + _kaka_user_name() + " ko Hinglish mein sunao - saare "
             "points, chhote vakya, max 8 vakya, koi tool mat chalao: " + str(text))
 
 

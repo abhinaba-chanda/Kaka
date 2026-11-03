@@ -320,10 +320,26 @@ def _weather_line() -> str:
         return ""
 
 
+def _kaka_user_name() -> str:          # KAKA: user name (app/kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "dost"
+    try:
+        return kaka_user.user_name()
+    except Exception:
+        return "dost"
+
+
 def greeting(now: datetime) -> str:
     h = now.hour
     part = "morning" if 4 <= h < 12 else ("afternoon" if 12 <= h < 17 else "evening")
-    g = f"Good {part} Abhinaba. Systems online."
+    g = f"Good {part} {_kaka_user_name()}. Systems online."
     try:                                   # update 21: "Welcome back" when the camera saw HIM
         from core import kaka_face as _f21
         return _f21.intro_greeting(g)

@@ -57,7 +57,9 @@ def configure() -> None:
     data = _read()
     fields = {"assistant_name": "Kaka"}
     if not str(data.get("user_name") or "").strip():
-        fields["user_name"] = "Abhinaba"
+        _env_name = os.environ.get("KAKA_USER_NAME", "").strip()   # KAKA: user name (Setup asks it)
+        if _env_name:
+            fields["user_name"] = _env_name
     try:
         from core.wake_word import is_ready
         if is_ready():

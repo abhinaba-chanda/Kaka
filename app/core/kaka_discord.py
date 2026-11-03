@@ -852,7 +852,23 @@ def _fit(path: str) -> str:
 
 
 # ------------------------------------------------------- Gemini tool routing
-_SYSTEM = ("Tum Kaka ho, Abhinaba ka Windows PC assistant. Ye command usne apne phone se "
+def _kaka_user_name() -> str:          # KAKA: user name (app/kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "dost"
+    try:
+        return kaka_user.user_name()
+    except Exception:
+        return "dost"
+
+
+_SYSTEM = ("Tum Kaka ho, {user} ka Windows PC assistant. Ye command usne apne phone se "
            "Discord DM mein bheja hai (woh PC ke saamne nahi hai). Agar kuch karna hai to "
            "EK sahi tool call karo, us tool ke rules ke hisaab se args bharo (uske "
            "Hinglish words jaise ke taise). Agar sirf sawaal hai to chhota Hinglish jawab do "
@@ -869,7 +885,7 @@ def gemini_route(text: str, decls: list, timeout: float = 25.0):
     if not key:
         return False, "", A._REASONS["nokey"], None
     body = {"contents": [{"role": "user", "parts": [{"text": str(text)}]}],
-            "systemInstruction": {"parts": [{"text": _SYSTEM}]},
+            "systemInstruction": {"parts": [{"text": _SYSTEM.replace("{user}", _kaka_user_name())}]},
             "generationConfig": {"temperature": 0.2}}
     if decls:
         body["tools"] = [{"functionDeclarations": decls}]

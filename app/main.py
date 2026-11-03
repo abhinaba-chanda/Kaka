@@ -389,8 +389,14 @@ _KAKA_VOCAB = [
     "Kaka", "kholo", "band karo", "chalao", "bajao", "likho", "banao", "dikhao",
     "VS Code", "Visual Studio Code", "Notepad", "Chrome", "Brave", "YouTube",
     "WhatsApp", "Spotify", "Downloads", "Documents", "Desktop", "C program",
-    "Python", "volume", "screenshot", "Arijit Singh", "Abhinaba", "File Explorer",
+    "Python", "volume", "screenshot", "Arijit Singh", "File Explorer",
 ]
+try:                                       # KAKA: user name - his own name is a word to hear right
+    import kaka_user as _kaka_user_v
+    if _kaka_user_v.configured_name():
+        _KAKA_VOCAB.append(_kaka_user_v.configured_name())
+except Exception:
+    pass
 
 _FOREIGN_SCRIPT_RE = re.compile(
     "[\u1100-\u11ff\u3130-\u318f\uac00-\ud7af"      # Hangul
@@ -1277,7 +1283,12 @@ class JarvisLive:
     def speak_error(self, tool_name: str, error: str):
         short = str(error)[:120]
         self.ui.write_log(f"ERR: {tool_name} — {short}")
-        self.speak(f"Sir, {tool_name} encountered an error. {short}")
+        try:                                   # KAKA: user name
+            import kaka_user as _kaka_user
+            _who = _kaka_user.user_name()
+        except Exception:
+            _who = "Sir"
+        self.speak(f"{_who}, {tool_name} encountered an error. {short}")
 
     def _build_config(self) -> types.LiveConnectConfig:
         from datetime import datetime
@@ -1290,6 +1301,11 @@ class JarvisLive:
         except Exception:
             self._asst_name = "Kaka"
             _user_name = ""
+        try:                                   # KAKA: user name (kaka_user.py: settings > KAKA_USER_NAME > "dost")
+            import kaka_user as _kaka_user
+            _user_name = _kaka_user.user_name()
+        except Exception:
+            _user_name = _user_name or "dost"
 
         memory     = load_memory()
         mem_str    = format_memory_for_prompt(memory)
@@ -1365,6 +1381,7 @@ class JarvisLive:
                   for d in _all_decls}
         sys_prompt = _render_prompt(sys_prompt, {
             "assistant_name": self._asst_name,
+            "user_name": _user_name,           # KAKA: user name
             "platform": f"{_platform.system()} {_platform.release()}".strip(),
             "capabilities": _describe_tools(_all_decls),
             "limits": _describe_limits(

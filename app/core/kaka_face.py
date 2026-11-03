@@ -581,7 +581,7 @@ def enroll(save_photo: bool = False) -> tuple:
     if not save_store(good, getattr(eng, "rec_name", "sface"), extra):
         return False, "Chehra ka data save nahi hua (F:\\Kaka\\Data\\face). Camera off."
     _INTRO["result"] = None
-    msg = (f"Ho gaya Abhinaba, tumhara chehra yaad kar liya ({len(good)} frames). Sirf numbers save kiye, "
+    msg = (f"Ho gaya {_kaka_user_name()}, tumhara chehra yaad kar liya ({len(good)} frames). Sirf numbers save kiye, "
            + ("aur ek photo bhi jaisa tumne bola." if extra.get("photo") else "koi photo nahi.")
            + " Camera off.")
     return True, msg
@@ -621,8 +621,24 @@ def enroll_async(save_photo: bool = False) -> str:
 
 
 # ------------------------------------------------------------------ greeting
+def _kaka_user_name() -> str:          # KAKA: user name (app/kaka_user.py)
+    try:
+        import kaka_user
+    except Exception:
+        try:
+            import os as _o, sys as _s
+            _s.path.insert(0, _o.path.dirname(_o.path.dirname(_o.path.abspath(__file__))))
+            import kaka_user
+        except Exception:
+            return "dost"
+    try:
+        return kaka_user.user_name()
+    except Exception:
+        return "dost"
+
+
 def welcome_text() -> str:
-    return "Welcome back Abhinaba."
+    return "Welcome back " + _kaka_user_name() + "."
 
 
 def _blocked_reason() -> str:
@@ -672,7 +688,8 @@ def intro_greeting(g: str, wait: float = 4.5) -> str:
     _INTRO["done"].wait(wait)
     r = _INTRO["result"] or {}
     if r.get("result") == "him":
-        new = welcome_text() + " " + g.replace(" Abhinaba.", ".").replace(" Abhinaba", "")
+        _n = _kaka_user_name()                 # KAKA: user name
+        new = welcome_text() + " " + g.replace(" " + _n + ".", ".").replace(" " + _n, "")
         STATE["last_greet"] = time.time()
         _INTRO["text"] = {g: new}
         _log("SYS: Chehra pehchana - intro mein 'Welcome back' joda.")
