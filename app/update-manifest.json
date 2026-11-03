@@ -116,7 +116,7 @@
   "app/core/outcome.py": "cfceec76ad8ae2415e9352eb1b2e934ead68b1425c82b6d251d51260e931c47f",
   "app/core/platform_support.py": "e6d160009124bb096422b6d6c3b83f45d891c9de4cdface2ef469b91f7c52d04",
   "app/core/plugin_loader.py": "61fc59e2acd1075ca171ed2d2283779e51d0972588f9976aa4e92e2233716683",
-  "app/core/prompt.txt": "757ae254c087a6aeb42fea7b30ab9f8e38f39b5443a0924814e18b1323771787",
+  "app/core/prompt.txt": "2691cac2536579241d32ae494b2e7b2d8a6a525baa2a604b7edc47d7846a8751",
   "app/core/sleep_hotkey.py": "229df5aaff396c8a7d254eb7a2d8d42886e4395bb012dbabbe7ee871b088e4c1",
   "app/core/speed.py": "db3acb59b3c1e99986861d0348f419c3f2212a04c5626fe1f488950166ea71a9",
   "app/core/spotify_playlist.py": "f2192aebf8c88956730cd57236dcc7bc71d74faba6d5277451e65e2eb3bf83c0",
