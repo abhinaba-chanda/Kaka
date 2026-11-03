@@ -2,7 +2,8 @@
 
 One small dialog for the new switches, so the existing panels stay as they
 were: personality mode, wake word, auto-update (+ check now), morning brief,
-conversation memory (view / clear), diary (view). Everything is saved through
+conversation memory (view / clear), diary (view), Screen Activity Tracker
+and "Help when stuck" (+ today's report). Everything is saved through
 kaka_user.save_setting / the feature's own module; any failure only shows a
 message in the dialog - it never breaks Kaka.
 """
@@ -190,6 +191,49 @@ def open_dialog(window, C=None):
     dl.toggled.connect(lambda on: (put_setting("daylog_enabled", bool(on)),
                                    say("Conversation memory " + ("ON" if on else "OFF"))))
     lay.addWidget(dl)
+
+    # -- Screen Activity Tracker (kaka_activity)
+    lay.addWidget(lbl("SCREEN ACTIVITY  (app / site time, stays on this PC, no screenshots)", 8, False, dim))
+    tr_row = QHBoxLayout()
+    tr = QCheckBox("Screen Activity Tracker (voice: 'tracker band karo')")
+    tr.setFont(f9)
+    tr.setObjectName("activityTracker")
+    tr.setChecked(bool(_safe(lambda: __import__("kaka_activity").tracker_enabled(), True)))
+    tr_row.addWidget(tr)
+    b_act = QPushButton("TODAY")
+    b_act.setFont(QFont("Courier New", 8, QFont.Weight.Bold))
+    tr_row.addWidget(b_act)
+    lay.addLayout(tr_row)
+    hp = QCheckBox("Help when stuck (error on screen -> asks once 'help chahiye?')")
+    hp.setFont(f9)
+    hp.setObjectName("activityHelp")
+    hp.setChecked(bool(_safe(lambda: __import__("kaka_activity").help_enabled(), True)))
+    hp.setEnabled(tr.isChecked())
+    lay.addWidget(hp)
+
+    def on_tracker(on):
+        ok = _safe(lambda: __import__("kaka_activity").set_enabled(bool(on)), False)
+        hp.setEnabled(bool(on))
+        say(("Screen Activity Tracker " + ("ON" if on else "OFF - tracking band")) if ok
+            else "Tracker setting save nahi hui.")
+    tr.toggled.connect(on_tracker)
+
+    def on_help(on):
+        ok = _safe(lambda: __import__("kaka_activity").set_help(bool(on)), False)
+        say(("Help when stuck " + ("ON" if on else "OFF")) if ok else "Setting save nahi hui.")
+    hp.toggled.connect(on_help)
+
+    def show_activity():
+        try:
+            import kaka_activity as A
+            import kaka_activity_ui as AU
+            A.tracker().save()
+            rep = A.report("today")
+            AU.show(rep)
+            say(A.spoken_summary(rep))
+        except Exception as e:
+            say(f"Report nahi khula: {e}")
+    b_act.clicked.connect(show_activity)
 
     # -- memory / diary viewers
     lay.addWidget(lbl("MEMORY  (stays on this PC only)", 8, False, dim))

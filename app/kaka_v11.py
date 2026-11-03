@@ -10,7 +10,7 @@
 
 Every v1.1 feature lives in its own module (kaka_persona, kaka_daylog,
 kaka_diary, kaka_doctor, kaka_junk, kaka_selfupdate, kaka_pcagent,
-kaka_features_ui); importing this file never imports them.
+kaka_features_ui, kaka_activity); importing this file never imports them.
 """
 from __future__ import annotations
 
@@ -113,7 +113,18 @@ def start() -> None:
         time.sleep(45)          # after the greeting / morning brief
         _update_check()
     threading.Thread(target=_run, name="kaka-v11-start", daemon=True).start()
+    _activity_start()
     _log(f"SYS: Kaka v{version()} features ready.")
+
+
+def _activity_start() -> None:
+    """Screen Activity Tracker (kaka_activity) - only when its switch is ON."""
+    try:
+        import kaka_activity
+        if kaka_activity.start():
+            _log("SYS: Screen Activity Tracker ON (sirf is PC pe, koi screenshot nahi).")
+    except Exception as e:
+        print(f"[v1.1] activity tracker failed: {e}")
 
 
 try:

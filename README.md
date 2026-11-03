@@ -111,6 +111,8 @@ Twelve upgrades in one update. Every feature is its own file in `app/`, so if on
 
 **Deep Research (new)** - "Chandrayaan-3 pe deep research karo", "deep dive into how transformers work", "X ke baare mein detail mein research karo". Kaka splits the topic into 4-6 sub-questions, searches each one, reads the actual web pages and Wikipedia, and writes a full report (overview, a section per question, key facts and numbers, different viewpoints, numbered clickable sources). It shows live progress, speaks a short summary in your language, opens the report on screen and saves it as Markdown + PDF in `Data\Research`. Follow up with "point 3 aur detail mein batao" or "is pe aur research karo". Quick questions still use normal search.
 
+**Screen Activity Tracker (new)** - "aaj ka activity report", "aaj kitna time YouTube pe", "is hafte ka report": Kaka counts time per app and per website (read from the window title, idle time not counted) and shows the top ones as bars on screen. If an error or "Not Responding" window stays in front, Kaka asks once "kuch dikkat lag rahi hai, help chahiye?" and only on yes looks at the screen and explains. Saved only on your PC (`Data\Activity`), no screenshots kept. On/off: Customise > **v1.1 FEATURES** (Screen Activity Tracker, Help when stuck) or "tracker band karo" / "tracker chalu karo".
+
 Already installed Kaka? Run **Kaka-Features.bat** once (it backs up every file it changes, installs the wake model, asks your city and restarts Kaka). From now on, auto-update does it for you.
 
 ---
