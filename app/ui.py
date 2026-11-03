@@ -4391,6 +4391,161 @@ class RemoteKeyOverlay(QWidget):
         self.closed.emit()
 
 
+# ── Author credit: name + GitHub mark, click opens the GitHub profile ───────
+# The mark is GitHub's own "mark-github" Octicon (MIT licence), stored as
+# plain move/curve/line steps so no SVG module is needed to draw it.
+GITHUB_PROFILE_URL = "https://github.com/abhinaba-chanda"
+_GH_MARK_16 = (
+    "M 8 0 C 12.42 0 16 3.58 16 8 C 16 9.676 15.473 11.31 14.496 12.672 C 13.518 14.033 12.138 15.054 10.55 15.59 C 10.15 15.67 10 15.42 10 15.21 C 10 14.94 10.01 14.08 10.01 13.01 C 10.01 12.26 9.76 11.78 9.47 11.53 C 11.25 11.33 13.12 10.65 13.12 7.58 C 13.12 6.7 12.81 5.99 12.3 5.43 C 12.38 5.23 12.66 4.41 12.22 3.31 C 12.22 3.31 11.55 3.09 10.02 4.13 C 9.38 3.95 8.7 3.86 8.02 3.86 C 7.34 3.86 6.66 3.95 6.02 4.13 C 4.49 3.1 3.82 3.31 3.82 3.31 C 3.38 4.41 3.66 5.23 3.74 5.43 C 3.23 5.99 2.92 6.71 2.92 7.58 C 2.92 10.64 4.78 11.33 6.56 11.53 C 6.33 11.73 6.12 12.08 6.05 12.6 C 5.59 12.81 4.44 13.15 3.72 11.94 C 3.57 11.7 3.12 11.11 2.49 11.12 C 1.82 11.13 2.22 11.5 2.5 11.65 C 2.84 11.84 3.23 12.55 3.32 12.78 C 3.48 13.23 4 14.09 6.01 13.72 C 6.01 14.39 6.02 15.02 6.02 15.21 C 6.02 15.42 5.87 15.66 5.47 15.59 C 3.877 15.06 2.491 14.041 1.509 12.679 C 0.527 11.316 -0.001 9.679 0 8 C 0 3.58 3.58 0 8 0 Z"
+)
+
+
+def _gh_mark_path(size: float) -> QPainterPath:
+    """The GitHub mark as a QPainterPath scaled into a size x size box."""
+    k = size / 16.0
+    path = QPainterPath()
+    toks = _GH_MARK_16.split()
+    i = 0
+    while i < len(toks):
+        op = toks[i]; i += 1
+        if op == "Z":
+            path.closeSubpath()
+            continue
+        n = 6 if op == "C" else 2
+        v = [float(t) * k for t in toks[i:i + n]]; i += n
+        if op == "M":
+            path.moveTo(v[0], v[1])
+        elif op == "L":
+            path.lineTo(v[0], v[1])
+        elif op == "C":
+            path.cubicTo(v[0], v[1], v[2], v[3], v[4], v[5])
+    return path
+
+
+def _open_github_profile(url: str = GITHUB_PROFILE_URL) -> bool:
+    """Open the author's GitHub profile in the default browser."""
+    try:
+        from PyQt6.QtGui import QDesktopServices
+        if QDesktopServices.openUrl(QUrl(url)):
+            return True
+    except Exception:
+        pass
+    try:
+        import webbrowser
+        return bool(webbrowser.open(url))
+    except Exception:
+        return False
+
+
+class _GitHubLink(QWidget):
+    """A small clickable credit: [GitHub mark] Name.
+
+    Drawn in the HUD's own colours and font, sized to its content so it never
+    covers neighbouring controls. Hover uses the same look as the header
+    buttons (accent text, dim accent border, ghost fill); click opens the
+    GitHub profile.
+    """
+
+    def __init__(self, text: str, pt: int = 8, bold: bool = True,
+                 icon: bool = True, parent=None):
+        super().__init__(parent)
+        self._text = text
+        self._pt = pt
+        self._bold = bold
+        self._icon = icon
+        self._hover = False
+        self._quiet = False
+        self.setObjectName("githubLink")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.setToolTip("github.com/abhinaba-chanda")
+        self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+        self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    def _font(self) -> QFont:
+        f = QFont("Courier New", self._pt)
+        if self._bold:
+            f.setWeight(QFont.Weight.Bold)
+        return f
+
+    def _metrics(self):
+        from PyQt6.QtGui import QFontMetrics
+        fm = QFontMetrics(self._font())
+        icon_sz = fm.height() - 1 if self._icon else 0
+        gap = 6 if self._icon else 0
+        return fm, icon_sz, gap
+
+    def sizeHint(self) -> QSize:
+        fm, icon_sz, gap = self._metrics()
+        w = icon_sz + gap + fm.horizontalAdvance(self._text) + 12
+        h = max(icon_sz, fm.height()) + 4
+        return QSize(w, h)
+
+    def minimumSizeHint(self) -> QSize:
+        return self.sizeHint()
+
+    def set_quiet(self, quiet: bool) -> None:
+        """Minimal look: soft grey like the other quiet header items."""
+        self._quiet = bool(quiet)
+        self.update()
+
+    def enterEvent(self, e):
+        self._hover = True
+        self.update()
+        super().enterEvent(e)
+
+    def leaveEvent(self, e):
+        self._hover = False
+        self.update()
+        super().leaveEvent(e)
+
+    def mouseReleaseEvent(self, e):
+        if (e.button() == Qt.MouseButton.LeftButton
+                and self.rect().contains(e.position().toPoint())):
+            _open_github_profile(GITHUB_PROFILE_URL)
+            e.accept()
+            return
+        super().mouseReleaseEvent(e)
+
+    def paintEvent(self, _e):
+        p = QPainter(self)
+        try:
+            p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            p.setRenderHint(QPainter.RenderHint.TextAntialiasing, True)
+            if self._quiet:
+                col = QColor("#ffffff") if self._hover else QColor(235, 235, 240, 140)
+                edge = QColor(255, 170, 90, 150)
+                fill = QColor(0, 0, 0, 0)
+            else:
+                col = QColor(C.PRI if self._hover else C.TEXT_MED)
+                edge = QColor(C.PRI_DIM)
+                fill = QColor(C.PRI_GHO)
+            r = QRectF(self.rect()).adjusted(0.5, 0.5, -0.5, -0.5)
+            if self._hover:
+                p.setPen(QPen(edge, 1))
+                p.setBrush(fill)
+                p.drawRoundedRect(r, 4, 4)
+            fm, icon_sz, gap = self._metrics()
+            x = 6.0
+            if self._icon and icon_sz > 0:
+                y = (self.height() - icon_sz) / 2.0
+                path = _gh_mark_path(icon_sz)
+                path.translate(x, y)
+                p.setPen(Qt.PenStyle.NoPen)
+                p.setBrush(col)
+                p.drawPath(path)
+                x += icon_sz + gap
+            p.setFont(self._font())
+            p.setPen(col)
+            p.setBrush(Qt.BrushStyle.NoBrush)
+            p.drawText(QRectF(x, 0, self.width() - x, self.height()),
+                       int(Qt.AlignmentFlag.AlignVCenter | Qt.AlignmentFlag.AlignLeft),
+                       self._text)
+        finally:
+            p.end()
+
+
 class MainWindow(QMainWindow):
     _log_sig        = pyqtSignal(str)
     _state_sig      = pyqtSignal(str)
@@ -5409,7 +5564,7 @@ class MainWindow(QMainWindow):
 
     def _build_header(self) -> QWidget:
         w = QWidget()
-        w.setFixedHeight(54)
+        w.setFixedHeight(82)
         w.setStyleSheet(f"background: {C.DARK}; border-bottom: 1px solid {C.BORDER_B};")
         lay = QHBoxLayout(w)
         lay.setContentsMargins(16, 0, 16, 0)
@@ -5473,6 +5628,11 @@ class MainWindow(QMainWindow):
         self._sub_lbl.setFont(QFont("Courier New", 7))
         self._sub_lbl.setStyleSheet(f"color: {C.PRI_DIM}; background: transparent;")
         mid.addWidget(self._sub_lbl)
+        # Author line: GitHub mark + name, opens github.com/abhinaba-chanda
+        self._gh_link = _GitHubLink("Abhinaba Chanda", pt=8, bold=True, icon=True)
+        mid.addSpacing(2)
+        mid.addWidget(self._gh_link, 0, Qt.AlignmentFlag.AlignHCenter)
+        mid.setContentsMargins(0, 2, 0, 6)
         if _kt is not None:            # KAKA: gold glowing name
             _kt.style_title(self._title_lbl)
         lay.addLayout(mid)
@@ -6409,7 +6569,8 @@ class MainWindow(QMainWindow):
 
         lay.addWidget(_fl("[F4] Mute  ·  [F11] Fullscreen"))
         lay.addStretch()
-        lay.addWidget(_fl("By Abhinaba Chanda", C.PRI_DIM))
+        self._footer_credit = _GitHubLink("By Abhinaba Chanda", pt=7, bold=False, icon=False)
+        lay.addWidget(self._footer_credit, 0, Qt.AlignmentFlag.AlignVCenter)
         return w
 
     def _on_file_selected(self, path: str):
@@ -6725,6 +6886,8 @@ class MainWindow(QMainWindow):
                 w.setVisible(not minimal)
             if getattr(self, "_mini_bar", None) is not None:
                 self._mini_bar.setVisible(minimal)
+            if getattr(self, "_gh_link", None) is not None:
+                self._gh_link.set_quiet(minimal)
             if minimal:
                 self._header.setStyleSheet("background: #000000; border: none;")
                 _quiet = ("QPushButton { background: transparent; color: rgba(235,235,240,110);"
