@@ -81,7 +81,9 @@ Full-size: [SETUP menu](docs/screenshots/menu-setup.png) · [CONTROLS menu](docs
 
 ## New features (v1.1)
 
-> **Get these features:** download **[Kaka-Setup-V1.1.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup-V1.1.bat)** and double-click it. It installs the newest Kaka with all 12 v1.1 features (new install or update of an existing one). See [Easy install](#easy-install-recommended-one-file-double-click) for the steps.
+> **Get these features:** download **[Kaka-Setup.exe](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup.exe)** or **[Kaka-Setup-V1.1.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup-V1.1.bat)** (download any one — both do the same thing) and double-click it. It installs the newest Kaka with all 12 v1.1 features (new install or update of an existing one). See [Easy install](#easy-install-recommended-one-file-double-click) for the steps.
+>
+> Windows may say 'Windows protected your PC' the first time for the exe (it is not code-signed): click More info → Run anyway.
 
 Twelve upgrades in one update. Every feature is its own file in `app/`, so if one cannot load (a missing package, no internet) the rest of Kaka keeps working. Kaka still **asks before anything that sends, deletes, buys, posts or installs**.
 
@@ -377,7 +379,9 @@ Other places Kaka touches:
 
 ### Easy install (recommended): one file, double-click
 
-**Easy install: download [Kaka-Setup-V1.1.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup-V1.1.bat) (direct download from [Releases](https://github.com/abhinaba-chanda/Kaka/releases/latest)) and double-click it.**
+**Easy install: download [Kaka-Setup.exe](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup.exe) or [Kaka-Setup-V1.1.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup-V1.1.bat) (download any one — both do the same thing; direct download from [Releases](https://github.com/abhinaba-chanda/Kaka/releases/latest)) and double-click it.**
+
+Windows may say 'Windows protected your PC' the first time for the exe (it is not code-signed): click More info → Run anyway.
 
 It does everything for you, with live progress, in plain English:
 

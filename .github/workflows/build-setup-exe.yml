@@ -1,0 +1,42 @@
+name: Build Kaka-Setup.exe
+
+# Builds the windowed installer Kaka-Setup.exe on Windows and tests it there:
+# a real install, a repair through the window, the uninstall pages and an
+# uninstall. Run it by hand from the Actions tab.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install build tools
+        run: python -m pip install -r installer/requirements-build.txt
+      - name: Build Kaka-Setup.exe
+        run: python installer/build.py
+      - name: Test on Windows
+        shell: powershell
+        run: .\installer\ci_test.ps1 -Exe installer\dist\Kaka-Setup.exe -Out ci-out
+      - name: Upload Kaka-Setup.exe
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Kaka-Setup
+          path: installer/dist/Kaka-Setup.exe
+          if-no-files-found: ignore
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: ci-out
+          if-no-files-found: ignore
