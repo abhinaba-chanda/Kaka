@@ -81,6 +81,8 @@ Full-size: [SETUP menu](docs/screenshots/menu-setup.png) · [CONTROLS menu](docs
 
 ## New features (v1.1)
 
+> **Get these features:** download **[Kaka-Setup.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup.bat)** and double-click it. It installs the newest Kaka with all 12 v1.1 features (new install or update of an existing one). See [Easy install](#easy-install-recommended-one-file-double-click) for the steps.
+
 Twelve upgrades in one update. Every feature is its own file in `app/`, so if one cannot load (a missing package, no internet) the rest of Kaka keeps working. Kaka still **asks before anything that sends, deletes, buys, posts or installs**.
 
 **1. "Hey Kaka" wake word** - Kaka sleeps until it hears "Hey Kaka" (or just "Kaka"), beeps, the HUD lights up, and you talk normally. After 45 seconds of silence it sleeps again. Fully offline (small Vosk model, ~40 MB, downloaded by Setup with a progress bar), very low CPU. On by default once the model is installed; turn it off in Customise > **v1.1 FEATURES** or CONTROLS > **WAKE WORD**. If the model is missing, Kaka just listens all the time like before.
