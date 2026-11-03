@@ -7470,6 +7470,11 @@ class _RootShim:
 class JarvisUI:
     def __init__(self, face_path: str, size=None):
         self._app = QApplication.instance() or QApplication(sys.argv)
+        try:                                   # KAKA: dark title bar, even in light mode
+            import kaka_darktitle as _kdt
+            _kdt.install(QApplication.instance())
+        except Exception:
+            pass
         self._app.setStyle("Fusion")
         if _kt is not None:            # KAKA: icon + taskbar identity
             _kt.apply_identity(self._app)
