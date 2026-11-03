@@ -94,7 +94,7 @@ def _read_full_config() -> dict:
 
 # Single source of truth for the release name — the window title, the header
 # badge and the readme must never disagree again.
-APP_VERSION  = "KAKA"          # KAKA update 6 (was "MARK LVI")
+APP_VERSION  = "KAKA"          # KAKA update 6
 APP_PROTOCOL = "KAKA"
 
 _DEFAULT_W, _DEFAULT_H = 980, 700
@@ -4380,7 +4380,7 @@ class MainWindow(QMainWindow):
         else:
             apply_kaka_black()          # KAKA: black + white, amber accent
 
-        self.setWindowTitle(_display)   # KAKA update 6 (was "... — MARK LVI")
+        self.setWindowTitle(_display)   # KAKA update 6
         self.setMinimumSize(_MIN_W, _MIN_H)
         self.resize(_DEFAULT_W, _DEFAULT_H)
 
@@ -6361,7 +6361,7 @@ class MainWindow(QMainWindow):
 
         lay.addWidget(_fl("[F4] Mute  ·  [F11] Fullscreen"))
         lay.addStretch()
-        lay.addWidget(_fl("By FatihMakes", C.PRI_DIM))
+        lay.addWidget(_fl("By Abhinaba Chanda", C.PRI_DIM))
         return w
 
     def _on_file_selected(self, path: str):

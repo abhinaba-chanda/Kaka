@@ -232,8 +232,8 @@ Setup steps are in [Discord bot setup](#discord-bot-setup).
 |---|---|
 | **OS** | Windows 10 or 11, 64-bit (Kaka was built and tested on Windows 10 build 19045) |
 | **Python** | **3.13** (3.11 is the minimum the setup script accepts; 3.13 is what Kaka runs on) |
-| **Git** | To clone this repository (or download the ZIP from GitHub) |
-| **RAM / disk** | 8 GB RAM is enough, 16 GB is comfortable. About 2 GB of disk for Python packages, browsers and models |
+| **Git** | Optional: only to clone this repository (Kaka-Setup.bat downloads a ZIP instead) |
+| **RAM / disk** | 8 GB RAM is enough, 16 GB is comfortable. About 3 GB of disk for Python packages, browsers, tools and models |
 | **Microphone + speakers** | For voice. Typing also works |
 | **Webcam** | Optional: face greet, chor alarm, gestures, webcam photo |
 | **GPU** | Optional. An NVIDIA GPU makes screen recording use NVENC; without one, recording uses the CPU. The AI runs in the cloud, so no GPU is needed for it |
@@ -271,15 +271,14 @@ A template of the settings file is in [`app/config/api_keys.example.json`](app/c
 
 ## Folders Kaka creates
 
-Kaka keeps its code and its data apart. The recommended layout (the one on my PC) is:
+Kaka keeps its code and its data in one folder that you choose. `Kaka-Setup.bat` makes this layout:
 
 ```text
-F:\Kaka\                       <- any drive / folder you like
-├── MarkLVI\                   <- this repository (clone it here)
-│   ├── app\                   <- the app (main.py)
-│   ├── Kaka-src\              <- Kaka.exe launcher source + icon
-│   ├── Kaka\Kaka.exe          <- the launcher, after you build it (optional)
-│   └── .venv\                 <- Python 3.13 virtual environment
+C:\Kaka\                       <- any drive / folder you like (this repository goes here)
+├── app\                       <- the app (main.py)
+├── Kaka-src\                  <- Kaka.exe launcher source + icon
+├── Kaka\Kaka.exe              <- the launcher, after you build it (optional)
+├── .venv\                     <- Python 3.13 virtual environment
 ├── Data\                      <- everything Kaka saves (made on first run)
 │   ├── notes.json, reminders.json, memory.json, clipboard.json
 │   ├── morning.json, game_mode.json, gestures.json, boot_intro.json
@@ -290,22 +289,24 @@ F:\Kaka\                       <- any drive / folder you like
 │   ├── Models\                <- hand-gesture model
 │   ├── Cache\  Temp\  BrowserProfiles\  Logs\
 │   └── kaka-timing.txt
-└── Tools\
-    └── ffmpeg\bin\            <- ffmpeg for screen recording
+├── Tools\
+│   └── ffmpeg\bin\            <- ffmpeg for screen recording
+└── Kaka-Setup.bat             <- copy of the installer (repair / update / uninstall)
 ```
 
 **How the Data folder is chosen** (from `app/kaka_paths.py`):
 
 1. the `KAKA_DATA` environment variable, if you set it;
-2. otherwise, if the app sits in a folder named `MarkLVI`, then `Data` **next to** `MarkLVI` (`F:\Kaka\Data` above);
-3. otherwise `F:\Kaka\Data` if an F: drive exists;
-4. otherwise `%USERPROFILE%\Kaka\Data`.
+2. otherwise `Data` inside the install folder (`C:\Kaka\Data` above);
+3. an older layout that keeps `Data` one level above the install folder is still found.
+
+`Kaka-Setup.bat` sets `KAKA_DATA`, `KAKA_TOOLS` and `KAKA_ROOT` (Windows user variables) to the folder you pick.
 
 | Setting | Default | Change it with |
 |---|---|---|
 | Data folder | see above | `KAKA_DATA` |
-| ffmpeg folder | `Tools\ffmpeg` beside `Data` (falls back to ffmpeg on PATH) | `KAKA_TOOLS` |
-| Launcher's app root | the folder above `Kaka.exe`, then `F:\Kaka\MarkLVI`, then `%USERPROFILE%\Kaka\MarkLVI` | `KAKA_ROOT` |
+| ffmpeg folder | `Tools\ffmpeg` in the install folder (falls back to ffmpeg on PATH) | `KAKA_TOOLS` |
+| Launcher's app root | the folder above `Kaka.exe`, then `C:\Kaka`, then `%USERPROFILE%\Kaka` | `KAKA_ROOT` |
 | Wake-word model | `app\models\vosk-model-small-en-us-0.15` | `KAKA_VOSK_MODEL` |
 | Wake-word confidence | `0.5` | `KAKA_WAKE_CONF` |
 
@@ -324,6 +325,28 @@ Other places Kaka touches:
 
 ## Install, step by step
 
+### Easy install (recommended): one file, double-click
+
+**Easy install: download [Kaka-Setup.bat](https://github.com/abhinaba-chanda/Kaka/releases/latest/download/Kaka-Setup.bat) from [Releases](https://github.com/abhinaba-chanda/Kaka/releases/latest) and double-click it.**
+
+It does everything for you, with live progress, in plain English:
+
+1. **Choose the install folder** in a folder window (default `C:\Kaka`, any drive works).
+2. **Checks your PC** and shows a table: Windows 10/11 64-bit, free space (about 3 GB), internet, Python 3.13, Git (not needed), NVIDIA GPU (for NVENC recording), webcam and microphone.
+3. **Options** you switch on or off: desktop shortcut, start with Windows, browser control, screen recording (ffmpeg), face greet + chor alarm, hand gestures, Discord phone remote, wake word "Kaka".
+4. **Python 3.13**: uses yours if you have it, otherwise installs it for your user only (no admin).
+5. **Downloads Kaka** from this repository (no Git needed), makes the Python environment and installs every package from PyPI.
+6. **Tools**: ffmpeg from GitHub into `Tools\ffmpeg`, the face / hand / wake-word models you picked.
+7. **Shortcuts**: Start Menu, Desktop (and Startup if you chose it), then **opens Kaka**.
+
+Setup **never asks for API keys**. When Kaka opens, paste your free Gemini key, and add more any time from the gear icon → **API KEYS**.
+
+Run `Kaka-Setup.bat` again (it keeps a copy in your install folder and in the Start Menu) to **repair / update** (your `Data` folder and API keys are kept) or to **uninstall**. Log: `%USERPROFILE%\kaka-setup-log.txt`.
+
+> If Windows shows "Windows protected your PC", click **More info → Run anyway** (the file is a plain text script; you can open it in Notepad to read it).
+
+### Manual install
+
 These steps give the same setup I run. Commands are for **Command Prompt** (`cmd`). Replace `F:\Kaka` with any folder you like.
 
 **1. Install Python 3.13 and Git**
@@ -334,30 +357,29 @@ These steps give the same setup I run. Commands are for **Command Prompt** (`cmd
 **2. Get the code**
 
 ```bat
-mkdir F:\Kaka
-git clone https://github.com/abhinaba-chanda/Kaka.git F:\Kaka\MarkLVI
+git clone https://github.com/abhinaba-chanda/Kaka.git F:\Kaka
 ```
 
-(Or download the ZIP from GitHub and unzip it so that the path is `F:\Kaka\MarkLVI\app\main.py`.)
+(Or download the ZIP from GitHub and unzip it so that the path is `F:\Kaka\app\main.py`.)
 
 **3. Make the virtual environment**
 
 ```bat
-cd /d F:\Kaka\MarkLVI
+cd /d F:\Kaka
 py -3.13 -m venv .venv
 ```
 
 **4. Install the app's packages** (5–15 minutes; installs `requirements.txt` for Windows and the Playwright browser)
 
 ```bat
-cd /d F:\Kaka\MarkLVI\app
+cd /d F:\Kaka\app
 ..\.venv\Scripts\python.exe setup.py
 ```
 
 **5. Start Kaka**
 
 ```bat
-cd /d F:\Kaka\MarkLVI\app
+cd /d F:\Kaka\app
 ..\.venv\Scripts\python.exe main.py
 ```
 
@@ -376,12 +398,12 @@ On the first start, paste your **Gemini API key** and save. Allow the microphone
 `Kaka.exe` is a tiny launcher. It starts the app with `pythonw` (no black window) and does nothing if Kaka is already running.
 
 ```bat
-cd /d F:\Kaka\MarkLVI
+cd /d F:\Kaka
 .venv\Scripts\python.exe -m pip install pyinstaller
 .venv\Scripts\python.exe -m PyInstaller --noconfirm --clean --onedir --windowed --name Kaka --icon Kaka-src\kaka.ico --distpath . Kaka-src\kaka_launcher.py
 ```
 
-That makes `F:\Kaka\MarkLVI\Kaka\Kaka.exe`. Options: `Kaka.exe --startup` (short delay, for Windows login), `--restart`, `--stop`, `--voice-toggle` (switch Brian ↔ Gemini voice).
+That makes `F:\Kaka\Kaka\Kaka.exe`. Options: `Kaka.exe --startup` (short delay, for Windows login), `--restart`, `--stop`, `--voice-toggle` (switch Brian ↔ Gemini voice).
 
 ---
 
@@ -396,7 +418,7 @@ About 5 minutes, once.
 5. Open that link → choose your **private** server (create one in the Discord app if you have none) → **Authorize**.
 6. Install the Discord library into Kaka's Python (one time):
    ```bat
-   cd /d F:\Kaka\MarkLVI\app
+   cd /d F:\Kaka\app
    ..\.venv\Scripts\python.exe -m core.kaka_discord --install
    ```
 7. On the PC: Kaka → gear icon → **API KEYS** → **DISCORD BOT TOKEN** → paste → **SAVE** → **TEST**.
@@ -414,7 +436,7 @@ About 5 minutes, once.
 
 ## Optional parts (face, gestures, wake word, recording)
 
-These were added by later Kaka updates. Each one is a separate download, so Kaka still starts if one of them is missing; the feature just stays off. Run the commands from `F:\Kaka\MarkLVI\app`.
+These were added by later Kaka updates. Each one is a separate download, so Kaka still starts if one of them is missing; the feature just stays off. Run the commands from `F:\Kaka\app`.
 
 | Part | How to turn it on |
 |---|---|
@@ -431,7 +453,7 @@ Setup logs for these go to `%USERPROFILE%\kaku-setup-logs\`.
 
 | Problem | Fix |
 |---|---|
-| Kaka does not open | Run it from `cmd` to see the error: `F:\Kaka\MarkLVI\.venv\Scripts\python.exe F:\Kaka\MarkLVI\app\main.py` |
+| Kaka does not open | Run it from `cmd` to see the error: `F:\Kaka\.venv\Scripts\python.exe F:\Kaka\app\main.py` |
 | "Python 3.x is newer than 3.13" or a package has no wheel | Use Python 3.13 for the venv: `py -3.13 -m venv .venv` |
 | The key screen keeps coming back | The Gemini key was not saved. Paste it again; check that `app\config\api_keys.json` has `gemini_api_key` |
 | Kaka stops answering after a while | The free Gemini quota is used up. Add Groq and other keys in API KEYS so the fallback chain can take over |
@@ -452,9 +474,10 @@ Setup logs for these go to `%USERPROFILE%\kaku-setup-logs\`.
 ## Project structure
 
 ```text
-Kaka/                          (clone this as ...\Kaka\MarkLVI)
+Kaka/                          (clone this into your install folder, e.g. C:\Kaka)
 ├── README.md                  this file
-├── LICENSE                    CC BY-NC 4.0 (FatihMakes' original + my changes)
+├── LICENSE                    CC BY-NC 4.0 (see Credits and licence)
+├── Kaka-Setup.bat             one-file Windows installer
 ├── docs/
 │   ├── banner.png, kaka-logo.png
 │   ├── screenshots/           HUD and menu renders
@@ -473,8 +496,7 @@ Kaka/                          (clone this as ...\Kaka\MarkLVI)
     ├── kaka_tools.py          settings helper: python kaka_tools.py status / voice gemini|brian|toggle
     ├── setup.py               installs the Python packages
     ├── requirements.txt
-    ├── readme.md              FatihMakes' original Mark LVI readme
-    ├── LICENSE                FatihMakes' licence file
+    ├── LICENSE                original licence file
     ├── actions/               tools Kaka can use (~45): WhatsApp, Spotify,
     │                          YouTube, VS Code, files, reminders, notes,
     │                          screen recording, gestures, face greet,
@@ -507,9 +529,9 @@ Kaka/                          (clone this as ...\Kaka\MarkLVI)
 
 Based on [Mark LVI by FatihMakes](https://github.com/FatihMakes/Mark-LVI) · licensed [CC BY-NC 4.0](https://creativecommons.org/licenses/by-nc/4.0/) · modified by Abhinaba Chanda
 
-- **Mark LVI** (base app, HUD, Gemini Live engine, base tools, phone dashboard) © 2026 FatihMakes. Kaka started from commit `4d4035c`. His credit stays in the source files and on the HUD.
+- **Mark LVI** (base app, HUD, Gemini Live engine, base tools, phone dashboard) © 2026 FatihMakes. Kaka started from commit `4d4035c`.
 - **Kaka changes** (everything listed under Features that is not in Mark LVI) © 2026 Abhinaba Chanda, under the same licence.
-- Vosk speech model by Alpha Cephei (Apache 2.0), downloaded on first use. Face models from OpenCV Zoo, hand model from Google MediaPipe, both downloaded on first use. See `app/readme.md` → *Third-Party Assets* for the rest.
+- Vosk speech model by Alpha Cephei (Apache 2.0), downloaded on first use. Face models from OpenCV Zoo, hand model from Google MediaPipe, both downloaded on first use.
 
 **Licence:** this project is licensed under **Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)**; the full text is in [LICENSE](LICENSE). You may use, share and change it for **non-commercial** purposes, as long as you keep the credit to FatihMakes and to Abhinaba Chanda and say what you changed. **Commercial use is not allowed.**
 

@@ -3100,15 +3100,15 @@ class JarvisLive:
 
 # KAKA update 8: one Kaka at a time ---------------------------------------------
 # Update-7's log showed two autostarts (Startup\Kaka.lnk and an old HKCU Run
-# entry), and Kaka.exe looked for the old window title "KAKA — MARK LVI", so a
+# entry), and Kaka.exe looked for an old window title, so a
 # second double-click started a second Kaka. Now a named mutex decides: the
 # second copy brings the first one's window to the front and quits.
-_KAKA_MUTEX_NAME = "Local\\Kaka-MarkLVI-SingleInstance"
+_KAKA_MUTEX_NAME = "Local\\Kaka-SingleInstance"
 _KAKA_MUTEX = None
 
 
 def _kaka_titles() -> set:
-    names = {"KAKA", "KAKA \u2014 MARK LVI"}
+    names = {"KAKA"}
     try:
         cfg = json.loads(open(API_CONFIG_PATH, encoding="utf-8").read())
         n = (cfg.get("assistant_name") or "").strip()

@@ -27,7 +27,7 @@ _IS_WIN = sys.platform == "win32"
 
 def kaka_titles() -> set:
     """Same rule as main.py _kaka_titles(): Kaka's own HUD window titles."""
-    names = {"KAKA", "KAKA \u2014 MARK LVI"}
+    names = {"KAKA"}
     try:
         import json
         from pathlib import Path

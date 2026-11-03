@@ -143,11 +143,11 @@ def roots() -> list:
 def skip_paths() -> set:
     s = set()
     try:
-        app = Path(__file__).resolve().parent.parent          # ...\MarkLVI\app
-        if app.parent.name.lower() == "marklvi":
-            s.add(os.path.normcase(str(app.parent)))
-        else:
-            s.add(os.path.normcase(str(app)))
+        app = Path(__file__).resolve().parent.parent          # ...\<install folder>\app
+        s.add(os.path.normcase(str(app)))
+        for extra in (".venv", "Kaka-src", "Tools"):        # Kaka's own folders beside app
+            if (app.parent / extra).exists():
+                s.add(os.path.normcase(str(app.parent / extra)))
     except Exception:
         pass
     try:
@@ -156,8 +156,11 @@ def skip_paths() -> set:
     except Exception:
         pass
     if sys.platform == "win32":
-        s.add(os.path.normcase("F:\\Kaka\\MarkLVI"))
-        s.add(os.path.normcase("F:\\Kaka\\Data\\Cache"))
+        try:
+            import kaka_paths
+            s.add(os.path.normcase(str(kaka_paths.DATA_ROOT / "Cache")))
+        except Exception:
+            pass
     return s
 
 

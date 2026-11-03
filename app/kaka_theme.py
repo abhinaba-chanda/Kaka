@@ -1,10 +1,10 @@
 """
-KAKA theme — Iron Man / J.A.R.V.I.S. style layer for the Mark LVI HUD.
+KAKA theme — Iron Man / J.A.R.V.I.S. style layer for the Kaka HUD.
 
 Added for Abhinaba (Nov 2026). Purely cosmetic and fail-safe: every function
 here is called inside try/except by ui.py, so a drawing error can never take
-the assistant down. Delete this file and the HUD simply looks like stock
-Mark LVI again.
+the assistant down. Delete this file and the HUD simply falls back to
+the plain look.
 
   paint_reactor(p, cx, cy, r, amp, t, speaking, state)  — arc-reactor glow behind the face
   paint_overlay(p, W, H, snap, state, speaking)         — gold corner frame, clock,
@@ -272,6 +272,6 @@ def apply_identity(app) -> None:
             app.setWindowIcon(QIcon(str(ico)))
         if sys.platform == "win32":
             import ctypes
-            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Kaka.Assistant.MarkLVI")
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("Kaka.Assistant")
     except Exception:
         pass

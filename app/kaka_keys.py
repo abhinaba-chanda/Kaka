@@ -179,7 +179,7 @@ NAMED = (
      "base_url": "https://openrouter.ai/api/v1", "model": "google/gemma-4-26b-a4b-it:free",
      "key_url": "https://openrouter.ai/settings/keys",
      "note": ":free models, 50/day",
-     "headers": {"HTTP-Referer": "https://github.com/FatihMakes/Mark-LVI", "X-Title": "Kaka"},
+     "headers": {"HTTP-Referer": "https://github.com/abhinaba-chanda/Kaka", "X-Title": "Kaka"},
      "limits": "Models ending :free - 20/min, 50/day"},
     # Update 8. Cloudflare needs the Account ID too (second field in the row).
     {"id": "cloudflare", "title": "CLOUDFLARE AI", "name": "Cloudflare Workers AI",

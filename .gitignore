@@ -13,6 +13,7 @@ discord.json
 
 # Personal data Kaka saves
 Data/
+Tools/
 app/memory/long_term.json
 app/memory/*.db
 

@@ -1,5 +1,5 @@
 """
-kaka_tools.py — settings helper for the KAKA edition of Mark LVI.
+kaka_tools.py — settings helper for Kaka by Abhinaba Chanda.
 
     python kaka_tools.py config            first-time setup (name, wake word, engines)
     python kaka_tools.py voice brian       Kaka speaks with ElevenLabs Brian (Gemini brain)

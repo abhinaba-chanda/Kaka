@@ -1,5 +1,5 @@
 """
-Kaka.exe — a small launcher for the KAKA edition of Mark LVI.
+Kaka.exe — a small launcher for Kaka by Abhinaba Chanda.
 
 Why a launcher and not the whole app frozen into one exe:
   The app loads dozens of files at runtime (face model, prompt, actions,
@@ -31,14 +31,14 @@ def _here():
 
 
 def _find_root():
-    """The MarkLVI folder: the one that holds app\\main.py and .venv."""
+    """The install folder: the one that holds app\\main.py and .venv."""
     cands = []
     env = os.environ.get("KAKA_ROOT", "").strip()
     if env:
         cands.append(env)
     h = _here()
-    cands += [os.path.dirname(h), h, r"F:\Kaka\MarkLVI",
-              os.path.join(os.path.expanduser("~"), "Kaka", "MarkLVI")]
+    cands += [os.path.dirname(h), h, r"C:\Kaka",
+              os.path.join(os.path.expanduser("~"), "Kaka")]
     for c in cands:
         if c and os.path.isfile(os.path.join(c, "app", "main.py")):
             return c
@@ -52,13 +52,16 @@ def _state_dir():
 
 
 def _logs_dir(root):
-    """Kaka's log lives with the rest of its data: F:\\Kaka\\Data\\Logs
-    (beside the MarkLVI folder). Falls back to %LOCALAPPDATA%\\Kaka."""
+    """Kaka's log lives with the rest of its data: <install folder>\\Data\\Logs
+    (inside the install folder; an older layout keeps it one level up).
+    Falls back to %LOCALAPPDATA%\\Kaka."""
     try:
         d = os.environ.get("KAKA_DATA", "").strip()
         if d:
             d = os.path.join(d, "Logs")
-        elif os.path.basename(os.path.normpath(root)).lower() == "marklvi":
+        elif os.path.isdir(os.path.join(root, "Data")):
+            d = os.path.join(root, "Data", "Logs")
+        elif os.path.isdir(os.path.join(os.path.dirname(os.path.normpath(root)), "Data")):
             d = os.path.join(os.path.dirname(os.path.normpath(root)), "Data", "Logs")
         else:
             d = ""
@@ -145,13 +148,13 @@ def _pythonw(root):
 
 def _focus_existing():
     """Bring the running Kaka window to the front, if it can be found.
-    Kaka update 8: the window is called "KAKA" now (was "KAKA \u2014 MARK LVI"),
-    so every top-level window is checked against both names."""
+    Kaka update 8: the window is called "KAKA";
+    every top-level window is checked against that name."""
     try:
         import ctypes
         from ctypes import wintypes
         u32 = ctypes.windll.user32
-        names = {"KAKA", "KAKA \u2014 MARK LVI"}
+        names = {"KAKA"}
         found = []
 
         @ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)

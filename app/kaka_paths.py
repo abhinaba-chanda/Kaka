@@ -5,10 +5,11 @@ Added for Abhinaba (Nov 2026). Everything Kaka makes (uploads from the phone,
 screenshots, projects, reminders, browser profiles, logs, temp audio, model
 caches) lives under one data folder on the same drive as the app:
 
-    F:\Kaka\Data\            (app in F:\Kaka\MarkLVI\app)
-    %USERPROFILE%\Kaka\Data\ (app in %USERPROFILE%\Kaka\MarkLVI\app)
+    <install folder>\Data\   (app in <install folder>\app, e.g. C:\Kaka\app)
 
-Set the environment variable KAKA_DATA to use another folder.
+Set the environment variable KAKA_DATA to use another folder (Kaka-Setup.bat
+sets it to <install folder>\Data). An older layout that keeps Data one level
+above the app's folder is still found.
 This file never changes where Kaka LOOKS for your own files (Desktop,
 Downloads, Documents...) - only where it writes its own.
 
@@ -29,12 +30,17 @@ def _root() -> Path:
     env = os.environ.get("KAKA_DATA", "").strip()
     if env:
         return Path(env)
-    # app -> MarkLVI -> Kaka ; data lives beside MarkLVI
-    if _APP.parent.name.lower() == "marklvi":
-        return _APP.parent.parent / "Data"
-    if sys.platform == "win32" and Path("F:/").exists():
-        return Path("F:/Kaka/Data")
-    return Path.home() / "Kaka" / "Data"
+    here = _APP.parent                    # the install folder (holds app\)
+    if (here / "Data").is_dir():
+        return here / "Data"
+    # older layout: <Kaka>\<folder>\app with Data one level higher
+    up = here.parent / "Data"
+    try:
+        if up.is_dir() and any((up / m).exists() for m in ("Cache", "Logs", "kaka-timing.txt", "notes.json")):
+            return up
+    except Exception:
+        pass
+    return here / "Data"
 
 
 DATA_ROOT = _root()

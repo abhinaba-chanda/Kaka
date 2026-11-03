@@ -36,7 +36,7 @@ def _get_desktop() -> Path:
     return Path.home() / "Desktop"
 
 # ─────────────────────────────────────────────────────────────────────────────
-#  REMOVED IN MARK LVI: the generated-code path
+#  REMOVED: the generated-code path           
 # ─────────────────────────────────────────────────────────────────────────────
 # This file used to carry three functions the rest of the project has no
 # equivalent of: `_ask_gemini_for_desktop_action` asked Gemini to write Python

@@ -486,7 +486,7 @@ def make_overlay(parent, duration_ms: int = ANIM_MS):
             qp.setPen(QColor(200, 245, 255, int(255 * fade)))
             f = QFont("Courier New", max(9, int(R / 9)), QFont.Weight.Bold)
             qp.setFont(f)
-            title = "KAKA  //  MARK LVI"
+            title = "KAKA  //  ABHINABA CHANDA"
             n = int(len(title) * min(1.0, t / 1.2))
             qp.drawText(QRectF(0, cy + R * 1.3, w, 30), int(Qt.AlignmentFlag.AlignHCenter), title[:n])
             f2 = QFont("Courier New", max(7, int(R / 14)))
