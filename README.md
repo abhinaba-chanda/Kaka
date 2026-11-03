@@ -12,8 +12,6 @@
 ![Gemini Live](https://img.shields.io/badge/Voice-Gemini%20Live-8E75B2?logo=googlegemini&logoColor=white)
 ![Licence CC BY-NC 4.0](https://img.shields.io/badge/Licence-CC%20BY--NC%204.0-lightgrey)
 
-<sub>Based on <a href="https://github.com/FatihMakes/Mark-LVI">Mark LVI by FatihMakes</a> · licensed <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a> · modified by Abhinaba Chanda</sub>
-
 </div>
 
 ---
@@ -56,8 +54,6 @@
 If one AI provider is busy or out of free quota, Kaka moves down a chain of free providers, so it keeps answering.
 
 This repository is the exact code that runs on my PC: the app folder (`app/`) and the source of the small `Kaka.exe` launcher (`Kaka-src/`). Only my private keys and settings are left out, and you add your own (see [API keys](#api-keys-all-free-to-start)).
-
-> Kaka is built on the open-source **Mark LVI** by **FatihMakes**. The original HUD, the Gemini Live voice engine, the base PC tools and the app design are his work, and his credit stays in the code and in the HUD. Everything on top (the Kaka name and K logo, the black theme, the minimal sphere, Hinglish, the provider chain, Discord remote, face greet, chor alarm, recording, gestures, morning brief, game and sleep mode, and the rest) was added for Kaka. See [Credits and licence](#credits-and-licence).
 
 ---
 
@@ -119,7 +115,7 @@ Full-size: [SETUP menu](docs/screenshots/menu-setup.png) · [CONTROLS menu](docs
 | **Hand gestures** | With the camera: open palm = play/pause, thumbs up = next, thumbs down = previous, one finger up/down = volume, V sign = wake Kaka. |
 | **Email and letters** | Opens Gmail compose already filled in. It never sends by itself. |
 | **Discord phone remote** | Control the PC from your phone through your own Discord bot (below). |
-| **Phone dashboard** | SETUP → REMOTE CONTROL shows a QR code and a key for the built-in phone dashboard on your Wi-Fi (from Mark LVI). |
+| **Phone dashboard** | SETUP → REMOTE CONTROL shows a QR code and a key for the built-in phone dashboard on your Wi-Fi. |
 | **Timing log** | Each task's time goes to `Data\kaka-timing.txt` (say "timing"). |
 | **Kaka.exe launcher** | Starts Kaka without a black console window, autostarts at Windows login from the Startup folder (no admin), and has `--restart`, `--stop` and `--voice-toggle`. |
 | **K logo everywhere** | The window, taskbar, Kaka.exe, shortcuts, dashboard and the Discord bot's photo. |
