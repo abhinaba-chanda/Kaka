@@ -44,7 +44,6 @@ exit /b %RC%
 # Kaka by Abhinaba Chanda - Setup (PowerShell part). Runs inside Kaka-Setup.bat.
 $ErrorActionPreference = 'Continue'
 $ProgressPreference = 'SilentlyContinue'
-try { [Console]::OutputEncoding = New-Object System.Text.UTF8Encoding $false } catch { }
 $env:PYTHONIOENCODING = 'utf-8'
 $env:PYTHONUTF8 = '1'
 $env:PIP_DISABLE_PIP_VERSION_CHECK = '1'
