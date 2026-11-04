@@ -87,7 +87,7 @@
   "app/core/installer.py": "ab591b58cb3c52544870c6c67236bdd229b7cd6ca36973a783f72c647e797fe5",
   "app/core/kaka_ai.py": "65b007f87e54f30cffe0bfc9bdfdf9a6732737115c71e8fc8fb564d9da33de25",
   "app/core/kaka_alarm.py": "8c485e40d87326572bd93969fac17261320b712740aa9a367fd091d8b91de0a3",
-  "app/core/kaka_bootintro.py": "5d360b91337a17b029645b07b7db42b821f58e903d9ed2a26468b6029954302c",
+  "app/core/kaka_bootintro.py": "e98ad4daa95c22a903166be54309ee3636cf7acd882679b49444fa23db003d74",
   "app/core/kaka_clipboard.py": "1fdf81987a08dd750725d4f76d51f5453e651acee1d80fb4a92a250f0aa9ac90",
   "app/core/kaka_discord.py": "4ce0ab9832ecd32bda566164ec22f64310031ed6cec34a24bdae848e30f478b0",
   "app/core/kaka_face.py": "d10359dd77af0276e2845e3d87c2a171e130589e7a8873ab64304ca9f5fa0feb",

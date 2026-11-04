@@ -548,7 +548,8 @@ def _asleep(j) -> bool:
 # ------------------------------------------------------------------ 21.2 Windows voice fallback
 def _win_say(text: str) -> bool:
     """Speak with Windows' own voice (System.Speech) when Kaka's live voice
-    is asleep or not connected yet. Hidden window, 40 s cap."""
+    is asleep or not connected yet. Hidden window, 40 s cap. True only when
+    PowerShell really finished with exit code 0; the outcome is logged."""
     if os.name != "nt" or not text:
         return False
     try:
@@ -557,12 +558,32 @@ def _win_say(text: str) -> bool:
         ps = ("Add-Type -AssemblyName System.Speech; "
               "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
               "$s.Rate = 0; $s.Speak('" + t + "')")
-        subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps],
-                       timeout=40, creationflags=0x08000000,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return True
-    except Exception:
+        r = subprocess.run(["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", ps],
+                           timeout=40, creationflags=0x08000000,
+                           stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        if r.returncode == 0:
+            _log_quiet("SYS: Windows voice: ok")
+            return True
+        tail = ""
+        try:
+            raw = r.stderr or b""
+            tail = (raw.decode("utf-8", "replace") if isinstance(raw, (bytes, bytearray)) else str(raw))
+            tail = " ".join(tail.split())[-160:]
+        except Exception:
+            tail = ""
+        _log_quiet(f"SYS: Windows voice failed (code {r.returncode})" + (f": {tail}" if tail else ""))
         return False
+    except Exception as e:
+        _log_quiet(f"SYS: Windows voice failed ({type(e).__name__})")
+        return False
+
+
+def _log_quiet(msg: str) -> None:
+    try:
+        _ks().log(msg)
+    except Exception:
+        pass
+
 
 def _run_intro(d: dict) -> None:
     ks = _ks()
@@ -591,15 +612,24 @@ def _run_intro(d: dict) -> None:
             ks.log("SYS: Boot intro: sleep mode on, isliye bola nahi.")
             return
         awake = bool(getattr(j, "_awake", True)) if j is not None else True
+        instr = ("Pehle bilkul ye bolo: '" + greeting(now) + "' Phir ye status chhote "
+                 "vakyon mein sunao: " + text[len(greeting(now)):].strip())
         if not awake:
-            ks.log("SYS: Boot intro (wake-word mode): Windows voice se bol raha hoon.")
-            res = "wake-word -> " + ("windows voice" if _win_say(text) else "popup-only")
-            if d.get("merge_morning"):
-                _release_morning()          # the U18 loop says it the normal way
+            # wake-word mode: Kaka's own live voice first (wakes Kaka, speaks,
+            # handles the session); Windows voice only if that did not speak.
+            ks.log("SYS: Boot intro (wake-word mode): Kaka ki awaaz se bol raha hoon.")
+            res = ks.say(instr, brief=False)
+            if res == "spoken":
+                res = "wake-word -> kaka voice"
+                spoken = True
+            else:
+                ks.log("SYS: Boot intro: Kaka ki awaaz nahi chali, Windows voice try kar raha hoon.")
+                spoken = _win_say(text)
+                res = f"wake-word {res} -> " + ("windows voice" if spoken else "popup-only")
+            if d.get("merge_morning") and not spoken:
+                _release_morning()          # nothing was said: the U18 loop says it the normal way
                 d["merge_morning"] = False
         else:
-            instr = ("Pehle bilkul ye bolo: '" + greeting(now) + "' Phir ye status chhote "
-                     "vakyon mein sunao: " + text[len(greeting(now)):].strip())
             res = ks.say(instr, brief=False)
             if res != "spoken":                       # 21.2: voice not ready -> Windows voice
                 res = f"{res} -> " + ("windows voice" if _win_say(text) else "silent")
