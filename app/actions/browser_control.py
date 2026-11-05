@@ -540,6 +540,18 @@ def _open_native(url: str, browser_name: Optional[str]) -> str:
             "no browser on this system could be opened", url=url)
 
 
+class _BrowserStartError(RuntimeError):
+    """The browser could not start (Playwright missing or its driver broken).
+    start() and run() raise this at once, so the caller gets one clear line
+    instead of a 60 s hang."""
+
+
+_BROWSER_START_MSG = (
+    "Browser abhi available nahi hai: Playwright install nahi hai ya kharab hai. "
+    "Kaka Setup chalao, Repair select karo, phir dobara try karo."
+)
+
+
 class _BrowserSession:
     """
     A full session for one browser instance.
@@ -557,6 +569,7 @@ class _BrowserSession:
         self._pw:      Playwright     | None = None
         self._context: BrowserContext | None = None
         self._page:    Page           | None = None
+        self._start_error: _BrowserStartError | None = None
         # "real" when the user's own browser profile was opened, "separate"
         # when their browser was already running and a private automation
         # profile had to be used instead. The difference is every sign-in they
@@ -564,8 +577,11 @@ class _BrowserSession:
         self.profile_kind: str = ""
 
     def start(self):
-        if self._thread and self._thread.is_alive():
+        if self._start_error is None and self._thread and self._thread.is_alive():
             return
+        # A failed earlier attempt left no running loop; start clean.
+        self._start_error = None
+        self._ready = threading.Event()
         self._thread = threading.Thread(
             target=self._run_loop,
             daemon=True,
@@ -573,12 +589,26 @@ class _BrowserSession:
         )
         self._thread.start()
         self._ready.wait(timeout=20)
+        if self._start_error is not None:
+            raise self._start_error
 
     def _run_loop(self):
         self._loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._loop)
-        self._loop.run_until_complete(self._async_init())
-        self._ready.set()
+        started = False
+        try:
+            self._loop.run_until_complete(self._async_init())
+            started = True
+        except BaseException as e:
+            # Playwright missing or broken: keep the reason in the log, tell
+            # the caller in plain words, and never leave start() waiting.
+            print(f"[Browser] {self.browser_name} could not start: {e!r}")
+            self._start_error = _BrowserStartError(_BROWSER_START_MSG)
+        finally:
+            self._ready.set()
+        if not started:
+            self._loop.close()
+            return
         self._loop.run_forever()
 
     async def _async_init(self):
@@ -589,13 +619,17 @@ class _BrowserSession:
         self._pw = await async_playwright().start()
 
     def run(self, coro, timeout: int = 60) -> str:
+        if self._start_error is not None:
+            if hasattr(coro, "close"):
+                coro.close()
+            raise self._start_error
         if not self._loop:
             raise RuntimeError(f"Session for '{self.browser_name}' not started.")
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
         return future.result(timeout=timeout)
 
     def close(self):
-        if self._loop:
+        if self._loop and self._start_error is None:
             asyncio.run_coroutine_threadsafe(self._async_close(), self._loop).result(10)
 
     async def _async_close(self):
@@ -1029,6 +1063,8 @@ class _SessionRegistry:
         with self._lock:
             if browser_name not in self._sessions:
                 sess = _BrowserSession(browser_name)
+                # Raises _BrowserStartError if the browser cannot start; nothing
+                # is cached then, so a later call tries again.
                 sess.start()
                 self._sessions[browser_name] = sess
                 print(f"[Registry] New session: {browser_name}")
@@ -1044,7 +1080,10 @@ class _SessionRegistry:
 
     def switch(self, browser_name: str) -> str:
         browser_name = _ALIASES.get(browser_name.lower().strip(), browser_name.lower().strip())
-        self._get_or_create(browser_name)
+        try:
+            self._get_or_create(browser_name)
+        except _BrowserStartError as e:
+            return str(e)
         self._active_browser = browser_name
         return f"Active browser → {browser_name}"
 
@@ -1125,7 +1164,12 @@ def browser_control(
     # navigation continues in that window (so multi-step tasks aren't split).
     if action in ("go_to", "search", "new_tab"):
         if _registry.has(browser):
-            sess = _registry.get(browser)
+            try:
+                sess = _registry.get(browser)
+            except _BrowserStartError as e:
+                result = str(e)
+                _log(player, result)
+                return result
             try:
                 if action == "search":
                     result = sess.run(sess.search(params.get("query", ""),
@@ -1160,6 +1204,10 @@ def browser_control(
     # navigated page — it doesn't sit on a blank page.
     try:
         sess = _registry.get(browser)
+    except _BrowserStartError as e:
+        result = str(e)
+        _log(player, result)
+        return result
     except Exception as e:
         result = f"Could not start browser session: {e}"
         _log(player, result)

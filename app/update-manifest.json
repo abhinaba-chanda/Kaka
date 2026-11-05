@@ -15,7 +15,7 @@
   "app/VERSION": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8",
   "app/actions/background_monitor.py": "8adc6a6f0889e9d34b3ab766c2a1ac58108c2194c8ebe3aaf5069a45f77bb0ad",
   "app/actions/boot_intro.py": "31038b319aa2fd16d748e8f60679a82c5585306bb4bbca3cbc805f69abf9bc66",
-  "app/actions/browser_control.py": "f2f71156c73436e44bcc7d5869fe6ec451ba34a01bf27adeee54b7a6119fd8f0",
+  "app/actions/browser_control.py": "1f159a19b536642260edd6cd7062b967901b4858585696c17b8549d4a9c5e9c7",
   "app/actions/clipboard_history.py": "a57e7421dcb515be7d53ff8e98b0c51827abdebf4c0a537a4045197aa5aea982",
   "app/actions/code_helper.py": "a18f567dd2822160cbc1ecb95d96423e3741da416615665e74723bf39bc5e0e5",
   "app/actions/computer_control.py": "b17833735e6d62f9787e9fb1936b8543b0a97eb416971365e4864ef7193284a4",
